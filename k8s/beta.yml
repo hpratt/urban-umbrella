@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: factorbook-beta-app-deployment
+  labels:
+    app: factorbook-beta-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: factorbook-beta-app
+  template:
+    metadata:
+      labels:
+        app: factorbook-beta-app
+    spec:
+      containers:
+      - name: factorbook-beta-app
+        image: gcr.io/devenv-215523/factorbook-app:v0.5.3
+        env:
+        - name: ENVIRONMENT
+          value: beta
+        - name: SERVICEURL
+          value: https://ga.staging.wenglab.org/graphql
+        - name: STREAMPEAKSHOST
+          value: https://ga.staging.wenglab.org/streampeaks
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: factorbook-beta-app-service
+  labels:
+    app: factorbook-beta-app
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: factorbook-beta-app
+---
+apiVersion: networking.gke.io/v1beta2
+kind: ManagedCertificate
+metadata:
+  name: factorbook-beta-cert
+spec:
+  domains:
+    - factorbook.org
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: factorbook-beta-app-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "factorbook-beta-staging-external-ip"
+    kubernetes.io/ingress.allow-http: "true"
+    networking.gke.io/managed-certificates: "factorbook-beta-cert"
+spec:
+  backend:
+    serviceName: factorbook-beta-app-service
+    servicePort: 80

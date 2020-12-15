@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container, Grid, Header } from 'semantic-ui-react';
 
+import logo from '../../../images/logo.png';
 import { BannerProps } from './types';
 
 const Banner: React.FC<BannerProps> = () => (
@@ -8,11 +9,13 @@ const Banner: React.FC<BannerProps> = () => (
         <Container>
             <Grid>
                 <Grid.Row>
-                    <Grid.Column width={3} align="center">
-                        [LOGO]
+                    <Grid.Column width={1} align="center">
+                        <img src={logo} alt="logo" />
                     </Grid.Column>
                     <Grid.Column width={13} verticalAlign="middle">
-                        <span style={{ fontSize: '22pt', fontFamily: 'arial' }}>[Name TBA]</span>
+                        <span style={{ fontSize: '22pt', fontFamily: 'arial' }}>
+                            Variant Prioritization App
+                        </span>
                         <Header as="h4" style={{ marginTop: '0.5em' }}>
                             Explore annotated SNPs and regulatory elements.
                         </Header>

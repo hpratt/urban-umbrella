@@ -1,6 +1,6 @@
 import React from 'react';
 import { DataTable, DataTableColumn } from "ts-ztable";
-import "ts-ztable/src/styles.css";
+import "./styles.css";
 
 import { QTLDataTableProps } from './types';
 import { QTLDataTableRow } from "../types";
@@ -31,6 +31,7 @@ const QTLDataTable: React.FC<QTLDataTableProps> = props => (
         rows={props.data}
         columns={COLUMNS}
         sortColumn={4}
+        itemsPerPage={8}
         searchable
     />
 );

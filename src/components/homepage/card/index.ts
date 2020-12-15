@@ -1,2 +1,4 @@
 import QTLCard from './qtl';
-export { QTLCard };
+import TFBSCard from './tfbs';
+import RECard from './re';
+export { QTLCard, TFBSCard, RECard };

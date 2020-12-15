@@ -10,7 +10,7 @@ const QTLCard: React.FC<QTLCardProps> = props => (
         <Image src={qtlCard} wrapped ui={false} alt="open chromatin map" />
         <Card.Content>
             <Card.Description>
-                Search eQTLs from GTEx, PsychENCODE, and other sources.
+                eQTLs from GTEx, PsychENCODE, and other sources.
             </Card.Description>
             <Card.Meta>100k eQTLs • 10 tissues</Card.Meta>
         </Card.Content>

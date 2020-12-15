@@ -17,3 +17,14 @@ export const SNP_QUERY = `
     }
   }
 `;
+
+export const LD_QUERY = `
+  query SNP($snpids: [String]!, $rSquaredThreshold: Float!, $population: String!) {
+    snpQuery(assembly: "hg38", snpids: $snpids) {
+      rsId
+      linkageDisequilibrium(population: $population, rSquaredThreshold: $rSquaredThreshold) {
+        rsId
+      }
+    }
+  }
+`;

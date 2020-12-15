@@ -8,7 +8,7 @@ import { NavbarProps } from './types';
 const Navbar: React.FC<NavbarProps> = props => (
     <Menu className="top fixed transparent" style={{ fontSize: '11pt' }}>
         <Menu.Item as={Link} to={Routes.homepage()}>
-            [Name TBA]
+            Variant Prioritization App
         </Menu.Item>
         {props.children}
     </Menu>
