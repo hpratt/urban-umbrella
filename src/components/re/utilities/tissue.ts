@@ -36,3 +36,7 @@ export function tissueFromExperimentName(name: string): string {
 export function tissueZScores(scores: ZScore[]): Map<string, number[]> {
     return groupBy(scores, x => tissueFromExperimentName(x.experiment), x => x.score);
 }
+
+export function summaryZScores(scores: ZScore[]): Map<string, number[]> {
+    return groupBy(scores, x => x.experiment.split("_")[2], x => x.score);
+}

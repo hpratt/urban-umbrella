@@ -18,7 +18,7 @@ const Banner: React.FC<BannerProps> = () => (
                             Variant Prioritization App: regulatory element search
                         </span>
                         <Header as="h4" style={{ marginTop: '0.5em' }}>
-                            Searching OCRs from PsychENCODE (116 ATAC-seq experiments in {TISSUE_MAP.values.length} brain regions)
+                            Searching OCRs from PsychENCODE (116 ATAC-seq experiments in {[ ...TISSUE_MAP.keys() ].length} brain regions)
                         </Header>
                     </Grid.Column>
                 </Grid.Row>

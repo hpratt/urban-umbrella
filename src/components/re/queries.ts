@@ -14,3 +14,25 @@ export const RDHS_QUERY = `
     }
   }
 `;
+
+export const LD_QUERY_WITH_COORDINATES = `
+  query SNP($snpids: [String]!, $rSquaredThreshold: Float!, $population: String!) {
+    snpQuery(assembly: "hg38", snpids: $snpids) {
+      rsId
+      coordinates {
+        chromosome
+        start
+        end
+      }
+      linkageDisequilibrium(population: $population, rSquaredThreshold: $rSquaredThreshold) {
+        rsId
+        rSquared
+        coordinates(assembly: "hg38") {
+          chromosome
+          start
+          end
+        }
+      }
+    }
+  }
+`;
