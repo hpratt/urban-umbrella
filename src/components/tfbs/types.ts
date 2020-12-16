@@ -5,7 +5,7 @@ export type GenomicRange = {
 }
 
 export interface TFBS {
-    pwm: number[][];
+    motif: { pwm: number[][]; };
     strand: string;
     genomic_region: GenomicRange;
     q_value: number;

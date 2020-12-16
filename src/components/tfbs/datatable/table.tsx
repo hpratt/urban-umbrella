@@ -8,7 +8,7 @@ import { TFBS } from "../types";
 
 const COLUMNS: DataTableColumn<TFBS>[] = [{
     header: "motif",
-    render: row => <DNALogo ppm={row.pwm} />,
+    render: row => <DNALogo ppm={row.motif.pwm} />,
     value: () => 0
 }, {
     header: "q-value",

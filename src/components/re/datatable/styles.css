@@ -1,0 +1,22 @@
+.pagination {
+    display: inline-block;
+    float: right;
+  }
+  .pagination li {
+    display: inline;
+  }
+  
+  .pagination li a {
+    color: black;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    border: 1px solid #ddd; /* Gray */
+    cursor: pointer;
+  }
+  .pagination .active a {
+  color: #fff;
+  cursor: default;
+  background-color: #337ab7;
+  border-color: #337ab7;
+}

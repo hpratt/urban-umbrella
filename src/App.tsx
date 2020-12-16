@@ -9,6 +9,7 @@ import { Navbar } from './components/navbar';
 import { Homepage } from './components/homepage';
 import { QTLPage } from './components/qtl';
 import { TFBSPage } from './components/tfbs';
+import { RDHSPage } from './components/re';
 
 const h = createBrowserHistory();
 
@@ -28,6 +29,9 @@ const App: React.FC = () => (
                 </Route>
                 <Route exact path={Routes.tfbs()}>
                     <TFBSPage />
+                </Route>
+                <Route exact path={Routes.re()}>
+                    <RDHSPage />
                 </Route>
             </Switch>
         </Router>
