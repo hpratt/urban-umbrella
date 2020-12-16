@@ -1,11 +1,11 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { associateBy } from 'queryz';
-import { GenomeBrowser, DenseBigBed, WrappedTrack, WrappedRulerTrack, GraphQLTrackSet, WrappedFullBigWig, GraphQLTranscriptTrack, PackTranscriptTrack, WrappedSquishTranscriptTrack, WrappedPackTranscriptTrack } from 'umms-gb';
+import { GenomeBrowser, DenseBigBed, WrappedTrack, WrappedRulerTrack, GraphQLTrackSet, WrappedFullBigWig, GraphQLTranscriptTrack, WrappedSquishTranscriptTrack, GraphQLLDTrack, WrappedLDTrack } from 'umms-gb';
 import { mean } from 'mathjs';
+import { Button, Checkbox, Icon, Modal } from 'semantic-ui-react';
 
 import { RDHSBrowserProps } from './types';
 import { TISSUE_MAP } from '../utilities';
-import { Button, Checkbox, Modal } from 'semantic-ui-react';
 
 const RDHSBrowser: React.FC<RDHSBrowserProps> = props => {
 
@@ -14,6 +14,7 @@ const RDHSBrowser: React.FC<RDHSBrowserProps> = props => {
     const summaryTissues = useMemo( () => [ ...(props.data[0]?.summaryZScores.keys() || []) ], [ props.data ]);
     const [ shown, setShown ] = useState(associateBy(sortedTissues, x => x, x => false));
     const [ modalShown, setModalShown ] = useState(false);
+    const [ anchor, setAnchor ] = useState(props.anchor);
     const toggleShown = useCallback( (i: string) => {
         const nShown = new Map([ ...shown ]);
         nShown.set(i, !nShown.get(i)!);
@@ -45,7 +46,7 @@ const RDHSBrowser: React.FC<RDHSBrowserProps> = props => {
                 color: mean(d.summaryZScores.get(x) || [ -10.0 ]) > 1.64 ? "#06da93" : "#8c8c8c"
             }))
         )
-    ), [props, tissues]);
+    ), [props, summaryTissues]);
 
     const referenceTrack = useMemo( () => ({
         url: "gs://data.genomealmanac.org/public/ATAC.aggregated.bigWig",
@@ -56,30 +57,51 @@ const RDHSBrowser: React.FC<RDHSBrowserProps> = props => {
 
     return (
         <>
+            <Button onClick={() => setModalShown(true)} size="mini"><Icon name="chart area" />Add Tracks</Button><br /> <br />
             <GenomeBrowser
-                innerWidth={1500}
+                innerWidth={1200}
                 width="90%"
                 domain={props.domain}
             >
-                <WrappedRulerTrack domain={props.domain} height={40} title="coordinates" titleSize={9} width={1500} id="ruler" />
+                <WrappedRulerTrack domain={props.domain} height={40} title="coordinates" titleSize={9} width={1200} id="ruler" />
+                <GraphQLLDTrack
+                    domain={props.domain}
+                    width={1200}
+                    transform=""
+                    id="hg38_ldtrack"
+                    population={[ props.ldPreferences.population ]}
+                    anchor={anchor || "rs141121886"}
+                    assembly="hg38"
+                    endpoint="https://snps.staging.wenglab.org/graphql"
+                >
+                    <WrappedLDTrack
+                        titleSize={9}
+                        trackMargin={12}
+                        height={100}
+                        domain={props.domain}
+                        width={1200}
+                        id="LD"
+                        title={`SNPs with Linkage Disequilibrium (${props.ldPreferences.population})`}
+                        onVariantClick={(snp: { rsId: string }) => { setAnchor(snp.rsId) }}
+                    />
+                </GraphQLLDTrack>
                 <GraphQLTranscriptTrack endpoint="https://ga.staging.wenglab.org/graphql" assembly="GRCh38" id="tx" domain={props.domain} transform="">
-                    <WrappedSquishTranscriptTrack trackMargin={20} rowHeight={16} width={1500} domain={props.domain} id="tx1" color="#880000" title="GENCODE v24 transcripts" titleSize={9} />
+                    <WrappedSquishTranscriptTrack trackMargin={20} rowHeight={16} width={1200} domain={props.domain} id="tx1" color="#880000" title="GENCODE v24 transcripts" titleSize={9} />
                 </GraphQLTranscriptTrack>
                 { summaryTissues.map( tissue => (
-                    <WrappedTrack width={1500} height={30} title={tissue} id={tissue} titleSize={9}>
-                        <DenseBigBed domain={props.domain} width={1500} height={25} data={summaryData.get(tissue)!} />
+                    <WrappedTrack width={1200} height={30} title={tissue} id={tissue} titleSize={9}>
+                        <DenseBigBed domain={props.domain} width={1200} height={25} data={summaryData.get(tissue)!} />
                     </WrappedTrack>
                 ))}
                 { tissues.map( tissue => shown.get(tissue.split(" ")[0]) ? (
-                    <WrappedTrack width={1500} height={30} title={TISSUE_MAP.get(tissue.split(" ")[0]) + ' ' + tissue.split(" ")[1]} id={tissue} titleSize={9}>
-                        <DenseBigBed domain={props.domain} width={1500} height={25} data={data.get(tissue)!} />
+                    <WrappedTrack width={1200} height={30} title={TISSUE_MAP.get(tissue.split(" ")[0]) + ' ' + tissue.split(" ")[1]} id={tissue} titleSize={9}>
+                        <DenseBigBed domain={props.domain} width={1200} height={25} data={data.get(tissue)!} />
                     </WrappedTrack>
                 ) : null)}
-                <GraphQLTrackSet tracks={[ referenceTrack ]} id="graphql" transform="" width={1500} endpoint="https://ga.staging.wenglab.org/graphql">
-                    <WrappedFullBigWig title="average reference brain ATAC-seq signal" height={80} color="#06da93" width={1500} domain={props.domain} id="bw" titleSize={9} />
+                <GraphQLTrackSet tracks={[ referenceTrack ]} id="graphql" transform="" width={1200} endpoint="https://ga.staging.wenglab.org/graphql">
+                    <WrappedFullBigWig title="average reference brain ATAC-seq signal" height={80} color="#06da93" width={1200} domain={props.domain} id="bw" titleSize={9} />
                 </GraphQLTrackSet>
             </GenomeBrowser><br />
-            <Button onClick={() => setModalShown(true)}>Add Tracks</Button>
             <Modal open={modalShown}>
                 <Modal.Header>Select Region-Specific Tracks</Modal.Header>
                 <Modal.Content>

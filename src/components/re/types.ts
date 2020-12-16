@@ -19,3 +19,8 @@ export type RDHSRow = {
     tissueZScores: Map<string, number[]>;
     summaryZScores: Map<string, number[]>;
 };
+
+export type NamedRegion = {
+    region: GenomicRange;
+    name: string;
+};

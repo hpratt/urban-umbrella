@@ -27,15 +27,18 @@ const COLUMNS = (tissues: string[]): DataTableColumn<RDHSRow>[] => [{
             </span>
         )
     }
-}))];
+})).slice(0, 12)];
 
-const RDHSDataTable: React.FC<RDHSDataTableProps> = props => (
-    <DataTable
-        rows={props.data}
-        columns={COLUMNS([ ...(props.data[0]?.tissueZScores.keys() || []) ])}
-        sortColumn={1}
-        itemsPerPage={8}
-        searchable
-    />
-);
+const RDHSDataTable: React.FC<RDHSDataTableProps> = props => {
+    const columns = COLUMNS([ ...(props.data[0]?.tissueZScores.keys() || []) ]);
+    return (
+        <DataTable
+            rows={props.data}
+            columns={columns}
+            sortColumn={columns.length > 2 ? 2 : 1}
+            itemsPerPage={8}
+            searchable
+        />
+    );
+};
 export default RDHSDataTable;

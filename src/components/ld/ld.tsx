@@ -1,9 +1,8 @@
 import React from 'react';
-import { Checkbox, Dropdown, Icon } from "semantic-ui-react";
+import { Checkbox, Dropdown } from "semantic-ui-react";
 import { UploadWithRegionOrSNPSearchBoxProps } from 'genomic-file-upload/dist/components/upload/WithSearchBox';
 
 import { ExampleProps } from './types';
-import LDDetailsModal from '../tfbs/modal/LDModal/LDDetailsModal';
 
 const POPULATIONS = [
     { text: 'African', value: 'AFR' },

@@ -2,16 +2,17 @@ import React, { useCallback, useState } from 'react';
 import { Container, Header, Menu } from 'semantic-ui-react';
 import { WrappedBatchRegionOrSNPSearch } from 'genomic-file-upload';
 
-import { RDHS, RDHSRow } from './types';
+import { NamedRegion, RDHS, RDHSRow } from './types';
 import { RDHS_QUERY } from './queries';
 import { Navbar } from '../navbar';
 import { RDHSDataTable } from './datatable';
 import { Banner } from './banner';
 import { GenomicRange } from 'genomic-file-upload/dist/utilities/types';
 import { summaryZScores, tissueZScores } from './utilities/tissue';
-import RDHSBrowser from './browser/browser';
+import RDHSBrowserPage from './browser/page';
 import { Example } from '../ld/ld';
 import { LD_QUERY_WITH_COORDINATES } from './queries';
+import { Link } from 'react-router-dom';
 
 function expand(c: GenomicRange, e: number): GenomicRange {
     return {
@@ -24,7 +25,7 @@ function expand(c: GenomicRange, e: number): GenomicRange {
 const RDHSPage: React.FC = () => {
 
     const [ rows, setRows ] = useState<RDHSRow[] | null>(null);
-    const [ regions, setRegions ] = useState<GenomicRange | null>(null);
+    const [ regions, setRegions ] = useState<NamedRegion[]>([]);
     const [ page, setPage ] = useState(0);
     const [ ldPreferences, setLDPreferences ] = useState({
         using: false,
@@ -33,26 +34,32 @@ const RDHSPage: React.FC = () => {
     });
 
     const loadBatch = useCallback( async (values: (GenomicRange | string)[]): Promise<RDHSRow[]> => {
-        setRegions(values.filter(x => (x as GenomicRange).chromosome !== undefined)[0] as GenomicRange || null);
+        const v = values.filter( x => (x as GenomicRange).chromosome === undefined );
+        const s = typeof v[0] === "string" ? v : [];
         const snps = await fetch("https://snps.staging.wenglab.org/graphql", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 query: LD_QUERY_WITH_COORDINATES,
                 variables: {
-                    snpids: values.filter( x => (x as GenomicRange).chromosome === undefined ),
+                    snpids: s,
                     rSquaredThreshold: ldPreferences.using ? ldPreferences.rSquared : 1.1,
                     population: ldPreferences.population
                 }
             })
         });
-        const coordinates = (await snps.json()).data.snpQuery.flatMap( (x: any) => [
+        const j = await snps.json();
+        setRegions([
+            ...regions,
+            ...values.filter(x => (x as GenomicRange).chromosome !== undefined).map(x => ({ region: x as GenomicRange, name: "" })),
+            ...j.data.snpQuery.map((x: any) => ({ region: expand(x.coordinates, 100000), name: x.rsId }))
+        ]);
+        const coordinates = j.data.snpQuery.flatMap( (x: any) => [
             x.coordinates,
             ...x.linkageDisequilibrium
                 .filter( (xx: any) => xx.rSquared > (ldPreferences.using ? ldPreferences.rSquared : 1.1) )
                 .map( (xx: any) => xx.coordinates )
         ]);
-        coordinates[0] && setRegions(expand(coordinates[0], 100000));
         return fetch("https://psychscreen.api.wenglab.org/graphql", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
@@ -70,11 +77,15 @@ const RDHSPage: React.FC = () => {
                 }));
             }
         );
-    }, [ ldPreferences ]);
+    }, [ ldPreferences, regions ]);
 
     return (
         <>
-            <Navbar />
+            <Navbar>
+                <Menu.Item as={Link} onClick={() => { setRows(null); setRegions([]); }}>
+                    Regulatory Elements
+                </Menu.Item>
+            </Navbar>
             <Banner />
             <Container style={{ marginTop: "3em", width: rows === null ? undefined : "95%" }}>
                 { rows === null ? (
@@ -93,7 +104,7 @@ const RDHSPage: React.FC = () => {
                         </Menu>
                         <Header as="h3">Your search returned {rows.length} regulatory element{rows.length !== 1 ? "s" : ""}:</Header>
                         { page === 0 ? (
-                            <RDHSBrowser data={rows} domain={regions!} />
+                            <RDHSBrowserPage data={rows} ranges={regions} ldPreferences={ldPreferences} />
                         ) : page === 1 ? (
                             <RDHSDataTable
                                 data={rows}
