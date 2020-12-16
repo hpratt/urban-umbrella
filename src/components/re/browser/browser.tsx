@@ -60,7 +60,7 @@ const RDHSBrowser: React.FC<RDHSBrowserProps> = props => {
             <Button onClick={() => setModalShown(true)} size="mini"><Icon name="chart area" />Add Tracks</Button><br /> <br />
             <GenomeBrowser
                 innerWidth={1200}
-                width="90%"
+                width="95%"
                 domain={props.domain}
             >
                 <WrappedRulerTrack domain={props.domain} height={40} title="coordinates" titleSize={9} width={1200} id="ruler" />
@@ -107,7 +107,7 @@ const RDHSBrowser: React.FC<RDHSBrowserProps> = props => {
                 <Modal.Content>
                     { sortedTissues.map( (x, i) => (
                         <React.Fragment key={x}>
-                            <Checkbox onChange={() => toggleShown(x)} />{TISSUE_MAP.get(x) || x}<br />
+                            <Checkbox onChange={() => toggleShown(x)} label={TISSUE_MAP.get(x) || x} /><br />
                         </React.Fragment>
                     ))}
                 </Modal.Content>

@@ -106,9 +106,7 @@ const RDHSPage: React.FC = () => {
                         { page === 0 ? (
                             <RDHSBrowserPage data={rows} ranges={regions} ldPreferences={ldPreferences} />
                         ) : page === 1 ? (
-                            <RDHSDataTable
-                                data={rows}
-                            />
+                            <RDHSDataTable data={rows} />
                         ) : null}
                     </>
                 )}

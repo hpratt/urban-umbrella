@@ -64,10 +64,10 @@ const RDHSBrowserPage: React.FC<RDHSBrowserPageProps> = props => {
 
     return (
         <Grid>
-            <Grid.Column width={3}>
+            <Grid.Column width={4}>
                 <DataTable columns={COLUMNS(setRegion)} rows={props.ranges} itemsPerPage={10} />
             </Grid.Column>
-            <Grid.Column width={13}>
+            <Grid.Column width={12}>
                 { rows.length > 0 && trueRegion ? (
                     <RDHSBrowser
                         onDomainChanged={domain => setRegion({ region: domain, name: region.name })}
