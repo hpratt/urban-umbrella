@@ -40,3 +40,7 @@ export function tissueZScores(scores: ZScore[]): Map<string, number[]> {
 export function summaryZScores(scores: ZScore[]): Map<string, number[]> {
     return groupBy(scores, x => x.experiment.split("_")[2], x => x.score);
 }
+
+export function toggleValue(m: Map<string, boolean>, k: string): Map<string, boolean> {
+    return new Map([ ...m, [ k, !m.get(k) ] ]);
+}
