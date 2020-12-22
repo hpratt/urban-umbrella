@@ -36,7 +36,7 @@ const RDHSBrowser: React.FC<RDHSBrowserProps> = props => {
     const tissues = useMemo( () => [ ...(props.data[0]?.tissueZScores.keys() || []) ], [ props.data ]);
     const summaryTissues = useMemo( () => [ ...(props.data[0]?.summaryZScores.keys() || []) ], [ props.data ]);
     const [ state, dispatch ] = useReducer(rDHSBrowserReducer, {
-        shown: associateBy(sortedTissues, x => x, x => false),
+        shown: associateBy(sortedTissues, x => x, () => false),
         modalShown: false,
         anchor: props.anchor
     });
