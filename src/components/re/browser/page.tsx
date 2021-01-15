@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { expandRange } from 'jubilant-carnival';
 import { Grid, Loader } from 'semantic-ui-react';
+import { expandRangeI } from 'jubilant-carnival';
 import { DataTable, DataTableColumn } from 'ts-ztable';
+
 import { RDHS_QUERY } from '../queries';
 import { NamedRegion, RDHS, RDHSRow } from '../types';
 import { summaryZScores, tissueZScores } from '../utilities/tissue';
@@ -36,7 +37,7 @@ const RDHSBrowserPage: React.FC<RDHSBrowserPageProps> = props => {
     const [ region, setRegion ] = useState(props.ranges[0]);
     const trueRegion = useMemo( () => region && region.region ? ({
         chromosome: region.region.chromosome,
-        ...(region.region.end - region.region.start < 50000 ? expandRange(region.region, 50000) : region.region)
+        ...(region.region.end - region.region.start < 50000 ? expandRangeI(region.region, 50000 / Math.abs(region.region.end - region.region.start)) : region.region)
     }) : null, [ region ]);
 
     useEffect( () => {

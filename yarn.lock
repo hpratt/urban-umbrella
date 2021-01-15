@@ -6598,10 +6598,10 @@ jsx-ast-utils@^2.2.1, jsx-ast-utils@^2.2.3:
     array-includes "^3.0.3"
     object.assign "^4.1.0"
 
-jubilant-carnival@^0.2.4:
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/jubilant-carnival/-/jubilant-carnival-0.2.4.tgz#bc3826bef79e0e5c5f8aa81508996af4310dd9d9"
-  integrity sha512-vfvrSbjCqFHAPjqcaSCClte5rTvVmcJjwzecmvbvIuDZmAspGFUTWOgJiikITXRbcJztI3BQwFFW2pHuU8z1pA==
+jubilant-carnival@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/jubilant-carnival/-/jubilant-carnival-0.3.0.tgz#564814626fd4a36d281b9a33c9bd47ea2a0594a6"
+  integrity sha512-HvW5xjFLkBYXWO/LBdJW3dopkVrYYfvkWBVnke08q+KMoMXGixvmijWS6yEPtBY2lq31Ng7DfseYYTTc3tU1Wg==
 
 keyboard-key@^1.0.4, keyboard-key@^1.1.0:
   version "1.1.0"

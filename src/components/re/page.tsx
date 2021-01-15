@@ -1,7 +1,8 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { Container, Header, Menu } from 'semantic-ui-react';
 import { WrappedBatchRegionOrSNPSearch } from 'genomic-file-upload';
 
+import { ClientContext } from '../../App';
 import { NamedRegion, RDHS, RDHSRow } from './types';
 import { RDHS_QUERY } from './queries';
 import { Navbar } from '../navbar';
@@ -13,6 +14,9 @@ import RDHSBrowserPage from './browser/page';
 import { Example } from '../ld/ld';
 import { LD_QUERY_WITH_COORDINATES } from './queries';
 import { Link } from 'react-router-dom';
+import { SNP_AUTOCOMPLETE_QUERY } from '../qtl/queries';
+import { SNPWithCoordinates } from '../qtl/types';
+import { matchGenomicRegion, matchIsGenomicCoordinate } from '../qtl/page';
 
 function expand(c: GenomicRange, e: number): GenomicRange {
     return {
@@ -24,6 +28,7 @@ function expand(c: GenomicRange, e: number): GenomicRange {
 
 const RDHSPage: React.FC = () => {
 
+    const client = useContext(ClientContext);
     const [ rows, setRows ] = useState<RDHSRow[] | null>(null);
     const [ regions, setRegions ] = useState<NamedRegion[]>([]);
     const [ page, setPage ] = useState(0);
@@ -79,6 +84,29 @@ const RDHSPage: React.FC = () => {
         );
     }, [ ldPreferences, regions ]);
 
+    const getSuggestions = useCallback(async (e: any, d: any): Promise<any[] | Record<string, any> | undefined> => {
+        return fetch(client, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                query: SNP_AUTOCOMPLETE_QUERY,
+                variables: { snpid: d.value }
+            })
+        }).then(response => response.json()).then(
+            response => {
+                const results: any[] = response.data.snpAutocompleteQuery.map( (x: SNPWithCoordinates) => ({
+                    title: x.rsId,
+                    description: `${x.coordinates.chromosome}:${x.coordinates.start.toLocaleString()}-${x.coordinates.end.toLocaleString()}`
+                })).slice(0, 3);                
+                if (matchIsGenomicCoordinate(matchGenomicRegion(d.value)))
+                    results.push({ title: d.value, description: "genomic coordinates (GRCh38 assembly)" });
+                else if (results.length === 0)
+                    results.push({ title: d.value, description: "(no suggestions)" });
+                return results;
+            }
+        )
+    }, [ client ]);
+
     return (
         <>
             <Navbar>
@@ -95,6 +123,7 @@ const RDHSPage: React.FC = () => {
                         title="Enter a genomic region to search for regulatory elements:"
                         onError={error => { setRows([]); console.log(error); }}
                         example={Example({ onLDPreferencesChanged: setLDPreferences, ldPreferences })}
+                        getSuggestions={getSuggestions}
                     />
                 ) : (
                     <>
