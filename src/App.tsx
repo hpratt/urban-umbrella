@@ -8,8 +8,9 @@ import { Routes } from './routes';
 import { Navbar } from './components/navbar';
 import { Homepage } from './components/homepage';
 import { QTLPage } from './components/qtl';
-import { TFBSPage } from './components/tfbs';
 import { RDHSPage } from './components/re';
+import { SNPAnnotationPage } from './components/snpannotation';
+import Page from './components/snp/Page';
 
 const h = createBrowserHistory();
 
@@ -28,10 +29,13 @@ const App: React.FC = () => (
                     <QTLPage />
                 </Route>
                 <Route exact path={Routes.tfbs()}>
-                    <TFBSPage />
+                    <SNPAnnotationPage />
                 </Route>
                 <Route exact path={Routes.re()}>
                     <RDHSPage />
+                </Route>
+                <Route exact path={"/snp/:snp"}>
+                    <Page />
                 </Route>
             </Switch>
         </Router>

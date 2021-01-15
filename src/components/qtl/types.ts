@@ -12,6 +12,12 @@ export interface QTL {
     pval_beta: number;
 };
 
+export type SNPWithCoordinates = {
+    rsId: string;
+    coordinates: GenomicRange;
+    gtex_eQTLs: QTL[];
+};
+
 export type SNPWithQTL = {
     rsId: string;
     coordinates: GenomicRange;

@@ -1,6 +1,6 @@
 export const SNP_QUERY = `
   query SNP($coordinates: [GenomicRangeInput]) {
-    snpQuery(assembly: "hg38", coordinates: $coordinates) {
+    snpQuery(assembly: "hg38", coordinates: $coordinates, common: true) {
       rsId
       coordinates {
         chromosome
@@ -13,6 +13,39 @@ export const SNP_QUERY = `
         pval_nominal
         slope
         pval_beta
+      }
+    }
+  }
+`;
+
+export const SNP_QUERY_BY_ID = `
+  query SNP($snpids: [String!]) {
+    snpQuery(assembly: "hg38", snpids: $snpids) {
+      rsId
+      coordinates {
+        chromosome
+        start
+        end
+      }
+      gtex_eQTLs {
+        gene_id
+        tissue
+        pval_nominal
+        slope
+        pval_beta
+      }
+    }
+  }
+`;
+
+export const SNP_AUTOCOMPLETE_QUERY = `
+  query SNP($snpid: String!) {
+    snpAutocompleteQuery(assembly: "hg38", snpid: $snpid) {
+      rsId
+      coordinates {
+        chromosome
+        start
+        end
       }
     }
   }
