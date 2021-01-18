@@ -57,7 +57,7 @@ const RDHSPage: React.FC = () => {
         setRegions([
             ...regions,
             ...values.filter(x => (x as GenomicRange).chromosome !== undefined).map(x => ({ region: x as GenomicRange, name: "" })),
-            ...j.data.snpQuery.map((x: any) => ({ region: expand(x.coordinates, 100000), name: x.rsId }))
+            ...j.data.snpQuery.map((x: any) => ({ region: expand(x.coordinates, 100000), name: x.id }))
         ]);
         const coordinates = j.data.snpQuery.flatMap( (x: any) => [
             x.coordinates,
@@ -95,7 +95,7 @@ const RDHSPage: React.FC = () => {
         }).then(response => response.json()).then(
             response => {
                 const results: any[] = response.data.snpAutocompleteQuery.map( (x: SNPWithCoordinates) => ({
-                    title: x.rsId,
+                    title: x.id,
                     description: `${x.coordinates.chromosome}:${x.coordinates.start.toLocaleString()}-${x.coordinates.end.toLocaleString()}`
                 })).slice(0, 3);                
                 if (matchIsGenomicCoordinate(matchGenomicRegion(d.value)))

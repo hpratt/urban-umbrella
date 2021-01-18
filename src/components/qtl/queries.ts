@@ -1,7 +1,7 @@
 export const SNP_QUERY = `
   query SNP($coordinates: [GenomicRangeInput]) {
     snpQuery(assembly: "hg38", coordinates: $coordinates, common: true) {
-      rsId
+      id
       coordinates {
         chromosome
         start
@@ -21,7 +21,7 @@ export const SNP_QUERY = `
 export const SNP_QUERY_BY_ID = `
   query SNP($snpids: [String!]) {
     snpQuery(assembly: "hg38", snpids: $snpids) {
-      rsId
+      id
       coordinates {
         chromosome
         start
@@ -41,7 +41,7 @@ export const SNP_QUERY_BY_ID = `
 export const SNP_AUTOCOMPLETE_QUERY = `
   query SNP($snpid: String!) {
     snpAutocompleteQuery(assembly: "hg38", snpid: $snpid) {
-      rsId
+      id
       coordinates {
         chromosome
         start
@@ -54,9 +54,9 @@ export const SNP_AUTOCOMPLETE_QUERY = `
 export const LD_QUERY = `
   query SNP($snpids: [String]!, $rSquaredThreshold: Float!, $population: String!) {
     snpQuery(assembly: "hg38", snpids: $snpids) {
-      rsId
+      id
       linkageDisequilibrium(population: $population, rSquaredThreshold: $rSquaredThreshold) {
-        rsId
+        id
       }
     }
   }

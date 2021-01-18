@@ -7,12 +7,12 @@ const client = new ApolloClient<any>({
     cache: new InMemoryCache(),
 });
 
-export function useSNPData(rsId: string, assembly: string, population: string) {
+export function useSNPData(id: string, assembly: string, population: string) {
     assembly = "hg38";
     return useQuery<SNPQueryResponse>(SNP_QUERY, {
         client,
         variables: {
-            snpids: rsId,
+            snpids: id,
             assembly,
             population,
         },

@@ -103,7 +103,7 @@ const RDHSBrowser: React.FC<RDHSBrowserProps> = props => {
                         width={1200}
                         id="LD"
                         title={`SNPs with Linkage Disequilibrium (${props.ldPreferences.population})`}
-                        onVariantClick={(snp: { rsId: string }) => { dispatch({ type: 'RDHS_BROWSER_ANCHOR_CHANGED', anchor: snp.rsId }) }}
+                        onVariantClick={(snp: { id: string }) => { dispatch({ type: 'RDHS_BROWSER_ANCHOR_CHANGED', anchor: snp.id }) }}
                     />
                 </GraphQLLDTrack>
                 <GraphQLTranscriptTrack endpoint="https://ga.staging.wenglab.org/graphql" assembly="GRCh38" id="tx" domain={props.domain} transform="">

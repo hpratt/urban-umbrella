@@ -73,13 +73,13 @@ const MotifIntersectionView: React.FC<IntersectionViewProps> = props => {
     const groupedSNPs = useMemo(() => {
         const grouped = groupBy(
             results || [],
-            x => x.snp.rsId,
+            x => x.snp.id,
             x => x
         );
         return props.snps.map(snp => ({
             ...snp,
             motifCount:
-                grouped.get(snp.rsId)?.filter(x => x.motif.flank_p_value < 0.05 && x.motif.shuffled_p_value < 0.05)
+                grouped.get(snp.id)?.filter(x => x.motif.flank_p_value < 0.05 && x.motif.shuffled_p_value < 0.05)
                     .length || 0,
         }));
     }, [results, props.snps]);

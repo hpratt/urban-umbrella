@@ -5,7 +5,7 @@ export const SNP_QUERY = gql`
         snpQuery(snpids: $snpids, assembly: $assembly) {
             refAllele
             refFrequency
-            rsId
+            id
             minorAlleleFrequency {
                 sequence
                 afr_af
@@ -24,7 +24,7 @@ export const SNP_QUERY = gql`
                 snp(assembly: $assembly) {
                     refAllele
                     refFrequency
-                    rsId
+                    id
                     minorAlleleFrequency {
                         sequence
                         afr_af
@@ -47,7 +47,7 @@ export const SNP_QUERY = gql`
 export const SNP_AUTOCOMPLETE_QUERY = gql`
     query suggestions($assembly: String!, $snpid: String!) {
         snpAutocompleteQuery(assembly: $assembly, snpid: $snpid) {
-            rsId
+            id
             coordinates {
                 chromosome
                 start

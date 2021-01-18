@@ -41,7 +41,7 @@ const TFBSPage: React.FC = () => {
         }).then(response => response.json()).then(
             response => {
                 const results: any[] = response.data.snpAutocompleteQuery.map( (x: SNPWithCoordinates) => ({
-                    title: x.rsId,
+                    title: x.id,
                     description: `${x.coordinates.chromosome}:${x.coordinates.start.toLocaleString()}-${x.coordinates.end.toLocaleString()}`
                 })).slice(0, 3);                
                 if (matchIsGenomicCoordinate(matchGenomicRegion(d.value)))

@@ -19,12 +19,12 @@ const POPULATION_MAP = new Map(POPULATIONS.map(x => [x.value, x.text]));
 
 const SNPAnnotationPage: React.FC = () => {
     const { assembly } = useParams<{ assembly: string }>();
-    const [rsId, setrsId] = useState('');
+    const [id, setid] = useState('');
     const [ld, setLD] = useState(false);
     const [population, setPopulation] = useState(POPULATIONS[0].value);
     const [rSquaredThreshold, setRSquaredThreshold] = useState(0.7);
     const [page, setPage] = useState(-1);
-    const { data, loading } = useSNPData(rsId, assembly, population);
+    const { data, loading } = useSNPData(id, assembly, population);
     const snps = useMemo(
         () =>
             data === undefined || data.snpQuery[0] === undefined
@@ -45,10 +45,10 @@ const SNPAnnotationPage: React.FC = () => {
             <Navbar />
             <Banner />
             <Container style={{ marginTop: '3em' }}>
-                {rsId === '' ? (
+                {id === '' ? (
                     <>
                         <h2>Enter a SNP to search for intersecting transcription factor binding sites and motifs:</h2>
-                        <SNPSearchBox assembly={assembly} onSearchEnter={setrsId} />
+                        <SNPSearchBox assembly={assembly} onSearchEnter={setid} />
                         <Divider style={{ marginTop: '5em', marginBottom: '3em' }} />
                         <h3>
                             <Icon name="settings" /> Linkage Disequilibrium settings
@@ -89,7 +89,7 @@ const SNPAnnotationPage: React.FC = () => {
                     <Loader active>Loading...</Loader>
                 ) : (
                     <>
-                        <h2>ENCODE TF annotations for {rsId}</h2>
+                        <h2>ENCODE TF annotations for {id}</h2>
                         {ld && (
                             <em>
                                 Including SNPs in LD in the {POPULATION_MAP.get(population)} population, r<sup>2</sup> &gt;
@@ -99,7 +99,7 @@ const SNPAnnotationPage: React.FC = () => {
                         <br />
                         <Button
                             onClick={() => {
-                                setrsId('');
+                                setid('');
                                 setPage(-1);
                             }}
                             icon="left arrow"

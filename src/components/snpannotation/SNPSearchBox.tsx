@@ -24,7 +24,7 @@ const SNPSearchBox: React.FC<SNPAutocompleteSearchBoxProps> = props => {
                 .then(results =>
                     setSuggestions(
                         results && results.data ? results.data.snpAutocompleteQuery.slice(0, 5).map(x => ({
-                            title: x.rsId,
+                            title: x.id,
                             description: `${x.coordinates.chromosome}:${x.coordinates.start}-${x.coordinates.end}`,
                         })) : []
                     )

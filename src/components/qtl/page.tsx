@@ -64,13 +64,13 @@ const QTLPage: React.FC = () => {
                 response[0].data.snpQuery.forEach( (x: SNPWithQTL) => {
                     x.gtex_eQTLs.forEach( q => results.push({
                         ...q,
-                        snp: x.rsId
+                        snp: x.id
                     }));
                 });
                 response[1].data.snpQuery.forEach( (x: SNPWithQTL) => {
                     x.gtex_eQTLs.forEach( q => results.push({
                         ...q,
-                        snp: x.rsId
+                        snp: x.id
                     }));
                 });
                 return results;
@@ -88,7 +88,7 @@ const QTLPage: React.FC = () => {
         }).then(response => response.json()).then(
             response => {
                 const results: any[] = response.data.snpAutocompleteQuery.map( (x: SNPWithCoordinates) => ({
-                    title: x.rsId,
+                    title: x.id,
                     description: `${x.coordinates.chromosome}:${x.coordinates.start.toLocaleString()}-${x.coordinates.end.toLocaleString()}`
                 })).slice(0, 3);
                 if (matchIsGenomicCoordinate(matchGenomicRegion(d.value)))

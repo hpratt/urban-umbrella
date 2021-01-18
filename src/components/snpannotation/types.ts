@@ -18,7 +18,7 @@ export interface SNP {
     rSquared?: number;
     refAllele: string;
     refFrequency: number;
-    rsId: string;
+    id: string;
     minorAlleleFrequency: MinorAlleleFrequency[];
     coordinates: GenomicRange;
 }

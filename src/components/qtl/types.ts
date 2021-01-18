@@ -13,13 +13,13 @@ export interface QTL {
 };
 
 export type SNPWithCoordinates = {
-    rsId: string;
+    id: string;
     coordinates: GenomicRange;
     gtex_eQTLs: QTL[];
 };
 
 export type SNPWithQTL = {
-    rsId: string;
+    id: string;
     coordinates: GenomicRange;
     gtex_eQTLs: QTL[];
 };

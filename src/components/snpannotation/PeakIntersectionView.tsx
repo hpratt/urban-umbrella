@@ -64,13 +64,13 @@ const PeakIntersectionView: React.FC<IntersectionViewProps> = props => {
     const groupedSNPs = useMemo(() => {
         const grouped = groupBy(
             results || [],
-            x => x.snp.rsId,
+            x => x.snp.id,
             x => x
         );
         return props.snps.map(snp => ({
             ...snp,
-            peakCount: grouped.get(snp.rsId)?.length || 0,
-            factorCount: new Set(grouped.get(snp.rsId)?.map(x => x.dataset.target)).size || 0,
+            peakCount: grouped.get(snp.id)?.length || 0,
+            factorCount: new Set(grouped.get(snp.id)?.map(x => x.dataset.target)).size || 0,
         }));
     }, [results, props.snps]);
 

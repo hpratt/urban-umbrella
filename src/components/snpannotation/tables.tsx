@@ -31,7 +31,7 @@ const INDEX_MAP = new Map([
 export const PEAK_TABLE_COLUMNS: DataTableColumn<SNPWithPeakCount>[] = [
     {
         header: 'SNP',
-        value: x => x.rsId,
+        value: x => x.id,
     },
     {
         header: (
@@ -54,7 +54,7 @@ export const PEAK_TABLE_COLUMNS: DataTableColumn<SNPWithPeakCount>[] = [
 export const MOTIF_TABLE_COLUMNS: DataTableColumn<SNPWithMotifCount>[] = [
     {
         header: 'SNP',
-        value: x => x.rsId,
+        value: x => x.id,
     },
     {
         header: (
@@ -73,7 +73,7 @@ export const MOTIF_TABLE_COLUMNS: DataTableColumn<SNPWithMotifCount>[] = [
 export const COMPLETE_PEAK_TABLE_COLUMNS: DataTableColumn<PeakWithSNP>[] = [
     {
         header: 'SNP',
-        value: x => x.snp.rsId || '',
+        value: x => x.snp.id || '',
     },
     {
         header: 'SNP coordinates',
@@ -117,7 +117,7 @@ export const COMPLETE_PEAK_TABLE_COLUMNS: DataTableColumn<PeakWithSNP>[] = [
 export const COMPLETE_MOTIF_TABLE_COLUMNS: DataTableColumn<MotifOccurrenceMatchWithSNP>[] = [
     {
         header: 'SNP',
-        value: x => x.snp.rsId || '',
+        value: x => x.snp.id || '',
     },
     {
         header: 'SNP coordinates',

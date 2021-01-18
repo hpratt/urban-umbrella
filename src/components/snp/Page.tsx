@@ -95,7 +95,7 @@ const QTLTab: React.FC<{ snp: string }> = props => {
                 data.data.snpQuery.forEach( (x: SNPWithQTL) => {
                     x.gtex_eQTLs.forEach( q => results.push({
                         ...q,
-                        snp: x.rsId
+                        snp: x.id
                     }));
                 });
                 return results;
