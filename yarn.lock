@@ -6833,11 +6833,6 @@ loglevel@^1.6.6:
   resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.6.7.tgz#b3e034233188c68b889f5b862415306f565e2c56"
   integrity sha512-cY2eLFrQSAfVPhCgH1s7JI73tMbg9YC3v3+ZHVW67sBS7UxWzNEk/ZBbSfLykBWHp33dqqtOv82gjhKEi81T/A==
 
-logo-ts@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/logo-ts/-/logo-ts-3.0.0.tgz#381fb957653932d22f29450124b40e446dd297e4"
-  integrity sha512-IwkOTVsixwGw6/leaMY5FJugm/Xl9xQKnm6wIhd1ZerpWm2qaPSQEp7A2N+HOCFz0cTRkzYHx9gnLDYHcQqfcA==
-
 logojs-react@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/logojs-react/-/logojs-react-2.1.1.tgz#fe3417b4bda72a2dad82dc8ca72d78989e264832"
@@ -6845,6 +6840,11 @@ logojs-react@^2.1.1:
   dependencies:
     react "^16.3.1"
     react-dom "^16.3.1"
+
+logots-react@^0.1.6:
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/logots-react/-/logots-react-0.1.6.tgz#4d3632c1732b87780b1e25988ccbb0ae661ec966"
+  integrity sha512-6mSwtEBWlE5Zy8OFS4SKiNVYzdrn4fKP5HqeixdOcS+w6V1ndJzMjEwxInk+5WfbcjwxTNz2GF9gL9HzkMF+Cg==
 
 loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.2.0, loose-envify@^1.3.1, loose-envify@^1.4.0:
   version "1.4.0"
@@ -10673,16 +10673,16 @@ typescript@~3.7.2:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.7.5.tgz#0692e21f65fd4108b9330238aac11dd2e177a1ae"
   integrity sha512-/P5lkRXkWHNAbcJIiHPfRoKqyd7bsyCma1hZNUGfn20qm64T6ZBlrzprymeu918H+mB/0rIg2gGK/BXkhhYgBw==
 
-umms-gb@^2.1.5:
-  version "2.1.5"
-  resolved "https://registry.yarnpkg.com/umms-gb/-/umms-gb-2.1.5.tgz#fa74e66c3dfe98221e8e10e20639e04bc22a2d41"
-  integrity sha512-hZla0oYWdMUFH16KMM63BN/F8SPH8etOSacqDLVokQb4ZWx7U7vmMAEXIz4tk1lWiNNZfCvPXF6VKk6rzlLU0Q==
+umms-gb@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/umms-gb/-/umms-gb-2.2.1.tgz#4e7417fa224bedf9432bf31b65686cb711afa7c9"
+  integrity sha512-RZyN+rnc1pasgWORSQ1mW78G+Yyloj1ggFCzQ7NwrTR19A8Lk4ByS/Nf/NgymlrImbLv6v5n41x8B60hhhukcQ==
   dependencies:
     "@types/uuid" "^8.0.0"
     bigwig-reader "^1.3.1"
     graphql "^15.3.0"
     graphql-tag "^2.10.4"
-    logo-ts "^3.0.0"
+    logots-react "^0.1.6"
     use-deep-compare-effect "^1.4.0"
 
 unicode-canonical-property-names-ecmascript@^1.0.4:

@@ -1,6 +1,6 @@
 {
   "name": "urban-umbrella",
-  "version": "0.3.2",
+  "version": "0.3.4",
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.0.2",
@@ -31,7 +31,7 @@
     "semantic-ui-react": "^1.0.0",
     "ts-ztable": "^0.2.1",
     "typescript": "~3.7.2",
-    "umms-gb": "^2.1.5"
+    "umms-gb": "^2.2.1"
   },
   "scripts": {
     "start": "react-scripts start",
