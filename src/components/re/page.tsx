@@ -99,7 +99,7 @@ const RDHSPage: React.FC = () => {
                     description: `${x.coordinates.chromosome}:${x.coordinates.start.toLocaleString()}-${x.coordinates.end.toLocaleString()}`
                 })).slice(0, 3);                
                 if (matchIsGenomicCoordinate(matchGenomicRegion(d.value)))
-                    results.push({ title: d.value, description: "genomic coordinates (GRCh38 assembly)" });
+                    results.push({ title: d.value, description: "genomic coordinates (hg38)" });
                 else if (results.length === 0)
                     results.push({ title: d.value, description: "(no suggestions)" });
                 return results;

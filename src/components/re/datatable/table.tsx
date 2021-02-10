@@ -10,7 +10,7 @@ const COLUMNS = (tissues: string[]): DataTableColumn<RDHSRow>[] => [{
     header: "accession",
     value: row => row.accession
 }, {
-    header: "coordinates",
+    header: "coordinates (hg38)",
     value: row => `${row.coordinates.chromosome}:${row.coordinates.start}-${row.coordinates.end}`
 }, ...tissues.map( (tissue: string): DataTableColumn<RDHSRow> => ({
     header: tissue,

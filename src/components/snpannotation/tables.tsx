@@ -76,7 +76,7 @@ export const COMPLETE_PEAK_TABLE_COLUMNS: DataTableColumn<PeakWithSNP>[] = [
         value: x => x.snp.id || '',
     },
     {
-        header: 'SNP coordinates',
+        header: 'SNP coordinates (hg38)',
         value: x => `${x.snp.coordinates.chromosome}:${x.snp.coordinates.start}`,
     },
     {
@@ -88,7 +88,7 @@ export const COMPLETE_PEAK_TABLE_COLUMNS: DataTableColumn<PeakWithSNP>[] = [
         value: x => x.snp.rSquared || 0,
     },
     {
-        header: 'peak coordinates',
+        header: 'peak coordinates (hg38)',
         value: x => `${x.chrom}:${x.chrom_start}-${x.chrom_end}`,
     },
     {
@@ -120,7 +120,7 @@ export const COMPLETE_MOTIF_TABLE_COLUMNS: DataTableColumn<MotifOccurrenceMatchW
         value: x => x.snp.id || '',
     },
     {
-        header: 'SNP coordinates',
+        header: 'SNP coordinates (hg38)',
         value: x => `${x.snp.coordinates.chromosome}:${x.snp.coordinates.start}-${x.snp.coordinates.end}`,
     },
     {
