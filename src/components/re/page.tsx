@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useState } from 'react';
-import { Container, Header, Menu } from 'semantic-ui-react';
+import { Container, Header, Menu, Message } from 'semantic-ui-react';
 import { WrappedBatchRegionOrSNPSearch } from 'genomic-file-upload';
 
 import { ClientContext } from '../../App';
