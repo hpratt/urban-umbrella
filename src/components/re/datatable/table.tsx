@@ -40,6 +40,13 @@ const RDHSDataTable: React.FC<RDHSDataTableProps> = props => {
     const columns = COLUMNS([ ...(props.data[0]?.tissueZScores.keys() || []) ]);
     return (
         <>
+            <DataTable
+                rows={props.data}
+                columns={columns}
+                sortColumn={columns.length > 2 ? 2 : 1}
+                itemsPerPage={8}
+                searchable
+            />
             <Message info>
                 <Grid>
                     <Grid.Column width={1}><Icon name="info circle" /></Grid.Column>
@@ -51,13 +58,6 @@ const RDHSDataTable: React.FC<RDHSDataTableProps> = props => {
                     </Grid.Column>
                 </Grid>
             </Message>
-            <DataTable
-                rows={props.data}
-                columns={columns}
-                sortColumn={columns.length > 2 ? 2 : 1}
-                itemsPerPage={8}
-                searchable
-            />
         </>
     );
 };
