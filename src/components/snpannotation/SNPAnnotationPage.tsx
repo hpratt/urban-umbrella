@@ -9,10 +9,11 @@ import PeakIntersectionView from './PeakIntersectionView';
 import SNPSearchBox from './SNPSearchBox';
 
 const POPULATIONS = [
-    { text: 'African', value: 'AFR' },
-    { text: 'Native American', value: 'AMR' },
-    { text: 'Asian', value: 'ASN' },
-    { text: 'European', value: 'EUR' },
+    { text: 'African', value: 'AFRICAN' },
+    { text: 'East Asian', value: 'EAST_ASIAN' },
+    { text: 'European', value: 'EUROPEAN' },
+    { text: 'Native American', value: 'AMERICAN' },
+    { text: 'South Asian', value: 'SOUTH_ASIAN' }
 ];
 
 const POPULATION_MAP = new Map(POPULATIONS.map(x => [x.value, x.text]));

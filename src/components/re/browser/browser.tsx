@@ -1,4 +1,4 @@
-import React, { useMemo, useReducer } from 'react';
+import React, { useMemo, useReducer, useRef } from 'react';
 import { associateBy } from 'queryz';
 import { GenomeBrowser, DenseBigBed, WrappedTrack, WrappedRulerTrack, GraphQLTrackSet, WrappedFullBigWig, GraphQLTranscriptTrack, WrappedSquishTranscriptTrack, GraphQLLDTrack, WrappedLDTrack } from 'umms-gb';
 import { mean } from 'mathjs';

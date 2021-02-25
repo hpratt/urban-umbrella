@@ -29,5 +29,9 @@ export type SNPQueryResult = {
 };
 
 export interface QTLDataTableRow extends QTL {
-    snp: string;
+    id: string;
+    name?: string;
+    coordinates: GenomicRange;
+    gene_coordinates?: GenomicRange;
+    snp_coordinates?: GenomicRange;
 };

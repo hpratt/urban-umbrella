@@ -10,6 +10,11 @@ query SNP(
 ) {
   snpQuery(assembly: "hg38", snpids: $snpids) {
     id
+    coordinates {
+      chromosome
+      start
+      end
+    }
     linkageDisequilibrium(
       population: $population
       subpopulation: $subpopulation
@@ -33,9 +38,16 @@ export type LDEntry = {
     rSquared: number;
 };
 
+export type GeneEntry = {
+    name: string;
+    id: string;
+    coordinates: GenomicRange;
+};
+
 export type LDQueryResponse = {
     snpQuery: {
         id: string;
+        coordinates: GenomicRange;
         linkageDisequilibrium: LDEntry[];
     }[];
 };

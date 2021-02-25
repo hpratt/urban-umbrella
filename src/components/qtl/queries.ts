@@ -19,7 +19,7 @@ export const SNP_QUERY = `
 `;
 
 export const SNP_QUERY_BY_ID = `
-  query SNP($snpids: [String!]) {
+  query SNP($snpids: [String!], $gene_name_prefix: [String!]) {
     snpQuery(assembly: "hg38", snpids: $snpids) {
       id
       coordinates {
@@ -33,6 +33,15 @@ export const SNP_QUERY_BY_ID = `
         pval_nominal
         slope
         pval_beta
+      }
+    }
+    gene(name_prefix: $gene_name_prefix, assembly: "grch38") {
+      name
+      id
+      coordinates {
+        chromosome
+        start
+        end
       }
     }
   }

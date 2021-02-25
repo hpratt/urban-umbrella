@@ -16,7 +16,7 @@ export const RDHS_QUERY = `
 `;
 
 export const LD_QUERY_WITH_COORDINATES = `
-  query SNP($snpids: [String]!, $rSquaredThreshold: Float!, $population: String!) {
+  query SNP($snpids: [String]!, $rSquaredThreshold: Float!, $population: Population!) {
     snpQuery(assembly: "hg38", snpids: $snpids) {
       id
       coordinates {

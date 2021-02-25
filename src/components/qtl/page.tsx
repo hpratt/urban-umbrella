@@ -1,7 +1,6 @@
-import React, { useContext, useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Container, Header, Menu } from 'semantic-ui-react';
 
-import { ClientContext } from '../../App';
 import { GenomicRange, QTLDataTableRow, SNPWithCoordinates, SNPWithQTL } from './types';
 import { SNP_QUERY, SNP_AUTOCOMPLETE_QUERY, SNP_QUERY_BY_ID } from './queries';
 import { Navbar } from '../navbar';
@@ -9,6 +8,8 @@ import { QTLDataTable } from './datatable';
 import { Banner } from './banner';
 import { WrappedBatchRegionOrSNPSearch } from 'genomic-file-upload';
 import { Browser } from './browser';
+import { associateBy } from 'queryz';
+import { GeneEntry } from './browser/queries';
 
 function parseCoordinate(match: RegExpMatchArray | null, field: string): number {
     const value = match?.groups && match.groups[field];
@@ -37,46 +38,49 @@ export function matchGenomicRegion(region: string): RegExpMatchArray | null {
 
 const QTLPage: React.FC = () => {
 
-    const client = useContext(ClientContext);
+    const client = "https://ga.staging.wenglab.org/graphql"; // useContext(ClientContext);
     const [ rows, setRows ] = useState<QTLDataTableRow[] | null>(null);
     const [ page, setPage ] = useState(0);
 
     const loadBatch = useCallback( async (value: (GenomicRange | any)[]): Promise<QTLDataTableRow[]> => {
         const coordinates = value.filter(x => (x as GenomicRange).chromosome !== undefined);
         const ids = value.filter(x => (x as GenomicRange).chromosome === undefined); // .flatMap(x => [ ...x ]);
-        const byCoordinates = coordinates.length > 0 ? fetch(client, {
+        return coordinates.length > 0 ? fetch(client, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 query: SNP_QUERY,
                 variables: { coordinates }
             })
-        }).then(response => response.json()) : { data: { snpQuery: [] }};
-        const byIDs = ids.length > 0 ? fetch(client, {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                query: SNP_QUERY_BY_ID,
-                variables: { snpids: ids }
-            })
-        }).then(response => response.json()) : { data: { snpQuery: [] }};
-        return Promise.all([ byCoordinates, byIDs ])
-            .then( response => {
-                const results: QTLDataTableRow[] = [];
-                response[0].data.snpQuery.forEach( (x: SNPWithQTL) => {
-                    x.gtex_eQTLs.forEach( q => results.push({
-                        ...q,
-                        snp: x.id
-                    }));
-                });
-                response[1].data.snpQuery.forEach( (x: SNPWithQTL) => {
-                    x.gtex_eQTLs.forEach( q => results.push({
-                        ...q,
-                        snp: x.id
-                    }));
-                });
-                return results;
+        }).then(response => response.json() || { data: { snpQuery: [] }}).then(async (data: any) => {
+            return [ data, ids.length + (data?.data.snpQuery || []).length > 0 ? await fetch(client, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query: SNP_QUERY_BY_ID,
+                    variables: {
+                        snpids: [ ...ids, ...(data?.data.snpQuery || []) ].map((x: SNPWithQTL) => x.id),
+                        gene_name_prefix: [ ...new Set((data?.data.snpQuery || []).flatMap( (x: SNPWithQTL) => x.gtex_eQTLs.map(x => x.gene_id.split(".")[0]) )) ]
+                    }
+                })
+            }) : undefined ]
+        }).then(async v => { console.log(v); return [ v[0], await v[1]?.json() || { data: { snpQuery: [], gene: [] }} ] }).then(async v => {
+            let [ _, byIDs ] = v;
+            byIDs = await byIDs;
+            const geneCoordinates = associateBy(byIDs.data.gene || [], (x: GeneEntry) => x.id.split(".")[0], ((x: GeneEntry) => x.coordinates));
+            const geneNames = associateBy(byIDs.data.gene || [], (x: GeneEntry) => x.id.split(".")[0], ((x: GeneEntry) => x.name));
+            const results: QTLDataTableRow[] = [];
+            byIDs.data.snpQuery.forEach( (x: SNPWithQTL) => {
+                x.gtex_eQTLs.forEach( q => results.push({
+                    ...q,
+                    id: x.id,
+                    coordinates: x.coordinates,
+                    gene_coordinates: geneCoordinates.get(q.gene_id.split(".")[0]),
+                    name: geneNames.get(q.gene_id.split(".")[0])
+                }));
             });
+            return results;
+        }) : [];
     }, [ client ]);
 
     const getSuggestions = useCallback(async (_: any, d: any): Promise<any[] | Record<string, any> | undefined> => {
@@ -131,9 +135,14 @@ const QTLPage: React.FC = () => {
                     </>
                 ) : (
                     <Browser
-                        domain={{ chromosome: "chr21", start: 38944818, end: 39274818 }}
+                        // domain={{ chromosome: "chr10", start: 6006376, end: 6726377 }}
+                        // domain={{ chromosome: "chr4", start: 102606371, end: 102666372 }}
+                        // domain={{ chromosome: "chr16", start: 11012144, end: 11132145 }}
+                        // domain={{ chromosome: "chr3", start: 49605050, end: 49725051 }}
+                        domain={{ chromosome: "chr21", start: 39004818, end: 39134818 }}
                         population="EUROPEAN"
                         rSquaredThreshold={0.1}
+                        qtls={rows}
                     />
                 )}
             </Container>

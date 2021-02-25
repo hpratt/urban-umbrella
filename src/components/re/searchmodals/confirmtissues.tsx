@@ -1,4 +1,3 @@
-import { compareFnProps } from 'jubilant-carnival/dist/utilities';
 import React from 'react';
 import { Button, Header, Modal } from 'semantic-ui-react';
 

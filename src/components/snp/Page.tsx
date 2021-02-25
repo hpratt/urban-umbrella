@@ -43,7 +43,7 @@ const Page: React.FC = () => {
 export default Page;
 
 const TFTab: React.FC<{ snp: string }> = props => {
-    const { data, loading } = useSNPData(props.snp, "hg38", "AFR");
+    const { data, loading } = useSNPData(props.snp, "hg38", "AFRICAN");
     const [ page, setPage ] = useState(0);
     const snps = useMemo(
         () =>
@@ -95,7 +95,8 @@ const QTLTab: React.FC<{ snp: string }> = props => {
                 data.data.snpQuery.forEach( (x: SNPWithQTL) => {
                     x.gtex_eQTLs.forEach( q => results.push({
                         ...q,
-                        snp: x.id
+                        coordinates: x.coordinates,
+                        id: x.id
                     }));
                 });
                 return results;

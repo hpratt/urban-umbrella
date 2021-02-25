@@ -7,7 +7,7 @@ import { QTLDataTableRow } from "../types";
 
 const COLUMNS: DataTableColumn<QTLDataTableRow>[] = [{
     header: "SNP",
-    value: row => row.snp
+    value: row => row.id
 }, {
     header: "gene ID",
     value: row => row.gene_id

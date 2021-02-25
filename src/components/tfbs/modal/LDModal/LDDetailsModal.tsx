@@ -20,14 +20,15 @@ function reducer(state: LDOptions, action: LDDetailsModalAction): LDOptions {
 }
 
 const POPULATIONS: { [ key: string ]: string } = {
-    AFR: "African",
-    AMR: "Native American",
-    ASN: "Asian",
-    EUR: "European"
+    AFRICAN: "African",
+    AMERICAN: "Native American",
+    SOUTH_ASIAN: "South Asian",
+    EAST_ASIAN: "East Asian",
+    EUROPEAN: "European"
 };
 
 export const LDDetailsModal: React.FC<LDDetailsModalProps> = props => {
-    const [ state, dispatch ] = useReducer(reducer, { population: "AFR", rSquaredThreshold: 0.7 });
+    const [ state, dispatch ] = useReducer(reducer, { population: "AFRICAN", rSquaredThreshold: 0.7 });
     return (
         <Modal open>
             <Modal.Header>LD Search Options</Modal.Header>

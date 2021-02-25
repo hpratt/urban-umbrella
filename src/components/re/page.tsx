@@ -30,7 +30,6 @@ function expand(c: GenomicRange, e: number): GenomicRange {
 
 function gValue(entry: number[]) {
     const values = entry.map(x => x === -10 ? -4 : x);
-    console.log(values);
     return values.length < 1 ? -10.0 : (values.length === 1 ? values[0] : mean(values));
 }
 
@@ -44,7 +43,7 @@ const RDHSPage: React.FC = () => {
     const [ ldPreferences, setLDPreferences ] = useState({
         using: false,
         rSquared: 0.7,
-        population: "EUR"
+        population: "EUROPEAN"
     });
 
     const filterByTissue = useCallback( (r: RDHSRow): boolean => (

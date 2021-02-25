@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const SNP_QUERY = gql`
-    query snp($snpids: [String], $assembly: String!, $population: String!, $rSquaredThreshold: Float) {
+    query snp($snpids: [String], $assembly: String!, $population: Population!, $rSquaredThreshold: Float) {
         snpQuery(snpids: $snpids, assembly: $assembly) {
             refAllele
             refFrequency
