@@ -19,7 +19,7 @@
     "jubilant-carnival": "^0.3.0",
     "logojs-react": "^2.1.1",
     "mathjs": "^8.1.0",
-    "pako": "^1.0.11",
+    "pako": "^2.0.3",
     "queryz": "^0.0.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -29,9 +29,10 @@
     "react-semantic-ui-range": "^0.7.0",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^1.0.0",
+    "ts-bedkit": "^0.1.0",
     "ts-ztable": "^0.2.1",
-    "typescript": "~3.7.2",
-    "umms-gb": "^2.2.1"
+    "typescript": "^3.7.3",
+    "umms-gb": "^2.4.0"
   },
   "scripts": {
     "start": "react-scripts start",

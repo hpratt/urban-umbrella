@@ -1,5 +1,5 @@
 import React, { useContext, useCallback, useState } from 'react';
-import { Container, Header } from 'semantic-ui-react';
+import { Container, Header, Menu } from 'semantic-ui-react';
 
 import { ClientContext } from '../../App';
 import { GenomicRange, QTLDataTableRow, SNPWithCoordinates, SNPWithQTL } from './types';
@@ -8,6 +8,7 @@ import { Navbar } from '../navbar';
 import { QTLDataTable } from './datatable';
 import { Banner } from './banner';
 import { WrappedBatchRegionOrSNPSearch } from 'genomic-file-upload';
+import { Browser } from './browser';
 
 function parseCoordinate(match: RegExpMatchArray | null, field: string): number {
     const value = match?.groups && match.groups[field];
@@ -38,6 +39,7 @@ const QTLPage: React.FC = () => {
 
     const client = useContext(ClientContext);
     const [ rows, setRows ] = useState<QTLDataTableRow[] | null>(null);
+    const [ page, setPage ] = useState(0);
 
     const loadBatch = useCallback( async (value: (GenomicRange | any)[]): Promise<QTLDataTableRow[]> => {
         const coordinates = value.filter(x => (x as GenomicRange).chromosome !== undefined);
@@ -105,6 +107,12 @@ const QTLPage: React.FC = () => {
             <Navbar />
             <Banner />
             <Container style={{ marginTop: "3em" }}>
+                { rows !== null ? (
+                    <Menu secondary pointing>
+                        <Menu.Item onClick={() => setPage(0)} active={page === 0}>Table View</Menu.Item>
+                        <Menu.Item onClick={() => setPage(1)} active={page === 1}>Browser View</Menu.Item>
+                    </Menu>
+                ) : null}
                 { rows === null ? (
                     <WrappedBatchRegionOrSNPSearch
                         getResults={loadBatch}
@@ -114,13 +122,19 @@ const QTLPage: React.FC = () => {
                         getSuggestions={getSuggestions}
                         example={() => <em>example: chr1:1,051,700-1,061,800</em>}
                     />
-                ) : (
+                ) : page === 0 ? (
                     <>
                         <Header as="h3">Your search returned {rows.length} eQTL{rows.length !== 1 ? "s" : ""}:</Header>
                         <QTLDataTable
                             data={rows}
                         />
                     </>
+                ) : (
+                    <Browser
+                        domain={{ chromosome: "chr21", start: 38944818, end: 39274818 }}
+                        population="EUROPEAN"
+                        rSquaredThreshold={0.1}
+                    />
                 )}
             </Container>
         </>

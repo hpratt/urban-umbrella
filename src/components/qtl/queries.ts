@@ -52,11 +52,21 @@ export const SNP_AUTOCOMPLETE_QUERY = `
 `;
 
 export const LD_QUERY = `
-  query SNP($snpids: [String]!, $rSquaredThreshold: Float!, $population: String!) {
+  query SNP(
+    $snpids: [String]!
+    $rSquaredThreshold: Float!
+    $population: Population!
+    $subpopulation: SubPopulation
+  ) {
     snpQuery(assembly: "hg38", snpids: $snpids) {
       id
-      linkageDisequilibrium(population: $population, rSquaredThreshold: $rSquaredThreshold) {
+      linkageDisequilibrium(
+        population: $population
+        subpopulation: $subpopulation
+        rSquaredThreshold: $rSquaredThreshold
+      ) {
         id
+        rSquaredThreshold
       }
     }
   }

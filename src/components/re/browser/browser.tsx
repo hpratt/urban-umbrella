@@ -82,7 +82,7 @@ const RDHSBrowser: React.FC<RDHSBrowserProps> = props => {
                 innerWidth={1200}
                 width="95%"
                 domain={props.domain}
-                onDomainChanged={x => { console.log("!", x); props.onDomainChanged && props.onDomainChanged({ start: x.start, end: x.end, chromosome: x.chromosome! }); }}
+                onDomainChanged={x => { props.onDomainChanged && props.onDomainChanged({ start: x.start, end: x.end, chromosome: x.chromosome! }); }}
             >
                 <WrappedRulerTrack domain={props.domain} height={40} title="coordinates (hg38)" titleSize={9} width={1200} id="ruler" />
                 <GraphQLLDTrack
