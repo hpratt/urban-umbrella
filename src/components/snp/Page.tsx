@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Divider, Loader, Menu, Message } from 'semantic-ui-react';
 import { Banner } from './banner';
@@ -7,21 +7,61 @@ import { useSNPData } from '../snpannotation/hooks';
 import MotifIntersectionView from '../snpannotation/MotifIntersectionView';
 import PeakIntersectionView from '../snpannotation/PeakIntersectionView';
 import { SNP_QUERY_BY_ID } from '../qtl/queries';
-import { ClientContext } from '../../App';
 import { QTLDataTableRow, SNPWithQTL } from '../qtl/types';
 import { QTLDataTable } from '../qtl/datatable';
 import { LD_QUERY_WITH_COORDINATES, RDHS_QUERY } from '../re/queries';
 import { RDHS, RDHSRow } from '../re/types';
 import { summaryZScores, tissueZScores } from '../re/utilities/tissue';
 import { RDHSDataTable } from '../re/datatable';
+import { associateBy } from 'queryz';
+import { GeneEntry } from '../qtl/browser/queries';
+
+const SNP_COORDINATE_QUERY = `
+    query SNP($coordinates: [GenomicRangeInput!]) {
+        snpQuery(assembly: "hg38", coordinates: $coordinates, common: true) {
+            id
+        }
+    }
+`;
+
+const COORDINATE = /(chr[0-9XYM]+)[:]([0-9,]+)[-]([0-9,]+)/g;
 
 const Page: React.FC = () => {
+    
     const [ page, setPage ] = useState(-1);
     const { snp } = useParams<{ snp: string }>();
-    return (
+    const [ sID, setSID ] = useState(snp);
+    const r = useMemo( () => [ ...snp.matchAll(COORDINATE) ], [ snp ]);
+    const coordinates = useMemo( () => {
+        if ((r?.length || 0) === 0) return;
+        const v = r[0]!;
+        if (v.length < 4) return;
+        const end = +v[3] - +v[2] <= 1 ? +v[2] + 2 : +v[3];
+        return {
+            chromosome: v[1],
+            start: +v[2],
+            end
+        };
+    }, [ r ]);
+
+    useEffect( () => {
+        if (coordinates)
+            fetch("https://snps.staging.wenglab.org/graphql", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query: SNP_COORDINATE_QUERY,
+                    variables: { coordinates }
+                })
+            }).then(response => response.json()).then(
+                data => setSID(data.data.snpQuery[0]?.id || "")
+            );
+    }, [ coordinates ]);
+    
+    return coordinates && sID.match(COORDINATE) ? <Loader active>Loading...</Loader> : (
         <>
             <Navbar />
-            <Banner snp={snp} />
+            <Banner snp={sID} />
             <Container style={{ width: "80%", marginTop: "3em" }}>
                 { page === -1 && <>Select an annotation category:<br /></> }
                 <Menu>
@@ -30,11 +70,11 @@ const Page: React.FC = () => {
                     <Menu.Item onClick={() => { setPage(2); }}>Regulatory Elements</Menu.Item>
                 </Menu>
                 { page === 0 ? (
-                    <TFTab snp={snp} />
+                    <TFTab snp={sID} />
                 ) : page === 1 ? (
-                    <QTLTab snp={snp} />
+                    <QTLTab snp={sID} />
                 ) : page === 2 ? (
-                    <RETab snp={snp} />
+                    <RETab snp={sID} />
                 ) : null}
             </Container>
         </>
@@ -78,11 +118,10 @@ const TFTab: React.FC<{ snp: string }> = props => {
 }
 
 const QTLTab: React.FC<{ snp: string }> = props => {
-    const client = useContext(ClientContext);
     const [ results, setResults ] = useState< QTLDataTableRow[] | undefined>(undefined);
     useEffect( () => {
         if (results !== undefined) return;
-        fetch(client, {
+        fetch("https://ga.staging.wenglab.org/graphql", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -90,11 +129,13 @@ const QTLTab: React.FC<{ snp: string }> = props => {
                 variables: { snpids: [ props.snp ] }
             })
         }).then(response => response.json()).then(
-            data => {                
+            data => {
+                const geneNames = associateBy(data.data.gene || [], (x: GeneEntry) => x.id.split(".")[0], ((x: GeneEntry) => x.name));
                 const results: QTLDataTableRow[] = [];
                 data.data.snpQuery.forEach( (x: SNPWithQTL) => {
                     x.gtex_eQTLs.forEach( q => results.push({
                         ...q,
+                        name: geneNames.get(q.gene_id.split(".")[0]),
                         coordinates: x.coordinates,
                         id: x.id
                     }));
@@ -102,7 +143,7 @@ const QTLTab: React.FC<{ snp: string }> = props => {
                 return results;
             }
         ).then(setResults);
-    }, [ client, props.snp, results ]);
+    }, [ props.snp, results ]);
     return results === undefined ? <Loader active>Loading...</Loader> : (
         <QTLDataTable data={results} />
     );
@@ -119,7 +160,7 @@ const RETab: React.FC<{ snp: string }> = props => {
                 variables: {
                     snpids: [ props.snp ],
                     rSquaredThreshold: 1.1,
-                    population: "AFR"
+                    population: "AFRICAN"
                 }
             })
         });

@@ -55,7 +55,8 @@ const RDHSPage: React.FC = () => {
     const filtered = useMemo( () => (rows || []).filter(filterByTissue), [ rows, filterByTissue ] );
 
     const loadBatch = useCallback( async (values: (GenomicRange | string)[]): Promise<RDHSRow[]> => {
-        const v = values.filter( x => (x as GenomicRange).chromosome === undefined );
+        let v = values.filter( x => (x as GenomicRange).chromosome === undefined );
+        if (typeof v[0] !== "string") v = [ ...(v[0] as unknown as Set<string>) ];
         const s = typeof v[0] === "string" ? v : [];
         const snps = await fetch("https://snps.staging.wenglab.org/graphql", {
             method: "POST",
@@ -152,7 +153,7 @@ const RDHSPage: React.FC = () => {
                             <Menu.Item onClick={() => setPage(0)} active={page === 0}>Genome Browser View</Menu.Item>
                             <Menu.Item onClick={() => setPage(1)} active={page === 1}>Table View</Menu.Item>
                         </Menu>
-                        <Header as="h3">There are {rows.length} regulatory element{rows.length !== 1 ? "s" : ""} in the region(s) you searched:</Header>
+                        <Header as="h3">Found {rows.length} regulatory element{rows.length !== 1 ? "s" : ""} in the region(s) you searched:</Header>
                         { page === 0 ? (
                             <RDHSBrowserPage data={rows} ranges={regions} ldPreferences={ldPreferences} />
                         ) : page === 1 ? (

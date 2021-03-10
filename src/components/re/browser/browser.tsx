@@ -1,4 +1,4 @@
-import React, { useMemo, useReducer, useRef } from 'react';
+import React, { useMemo, useReducer } from 'react';
 import { associateBy } from 'queryz';
 import { GenomeBrowser, DenseBigBed, WrappedTrack, WrappedRulerTrack, GraphQLTrackSet, WrappedFullBigWig, GraphQLTranscriptTrack, WrappedSquishTranscriptTrack, GraphQLLDTrack, WrappedLDTrack } from 'umms-gb';
 import { mean } from 'mathjs';
@@ -82,7 +82,7 @@ const RDHSBrowser: React.FC<RDHSBrowserProps> = props => {
                 innerWidth={1200}
                 width="95%"
                 domain={props.domain}
-                onDomainChanged={x => { props.onDomainChanged && props.onDomainChanged({ start: x.start, end: x.end, chromosome: x.chromosome! }); }}
+                onDomainChanged={x => { console.log(x); props.onDomainChanged && props.onDomainChanged({ start: x.start, end: x.end, chromosome: x.chromosome! }); }}
             >
                 <WrappedRulerTrack domain={props.domain} height={40} title="coordinates (hg38)" titleSize={9} width={1200} id="ruler" />
                 <GraphQLLDTrack
@@ -90,7 +90,7 @@ const RDHSBrowser: React.FC<RDHSBrowserProps> = props => {
                     width={1200}
                     transform=""
                     id="hg38_ldtrack"
-                    population={[ props.ldPreferences.population ]}
+                    populations={[{ population: props.ldPreferences.population }]}
                     anchor={state.anchor || "rs141121886"}
                     assembly="hg38"
                     endpoint="https://snps.staging.wenglab.org/graphql"

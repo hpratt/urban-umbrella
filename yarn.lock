@@ -10690,10 +10690,10 @@ typescript@^3.7.3:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.9.tgz#e69905c54bc0681d0518bd4d587cc6f2d0b1a674"
   integrity sha512-kdMjTiekY+z/ubJCATUPlRDl39vXYiMV9iyeMuEuXZh2we6zz80uovNN2WlAxmmdE/Z/YQe+EbOEXB5RHEED3w==
 
-umms-gb@^2.4.1:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/umms-gb/-/umms-gb-2.4.1.tgz#e673073ad84e3f01372490a9652302fc0d09fc65"
-  integrity sha512-OpehVuF4DAcnDUPKB+CbzEERZo4lg43b7ARcuJDK8eaxfMVm9AKdMrZs6zli0NQRU+R/ZmvhPQRNzwDJqiAHBg==
+umms-gb@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/umms-gb/-/umms-gb-3.0.3.tgz#bade62621e52a1ddf8aade87ad1146df31e713ca"
+  integrity sha512-k5cnugKvoXZM8RrW2RTQLbzhRgvxkJ0bbuID65Nkjmu8SCGGLjnJmtCJ9r6G0VelEO82TkhkO/NfaWnLzr726w==
   dependencies:
     "@types/uuid" "^8.0.0"
     bigwig-reader "^1.3.1"

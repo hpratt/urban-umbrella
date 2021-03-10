@@ -1,5 +1,5 @@
 export const SNP_QUERY = `
-  query SNP($coordinates: [GenomicRangeInput]) {
+  query SNP($coordinates: [GenomicRangeInput], $gene_name_prefix: [String!]) {
     snpQuery(assembly: "hg38", coordinates: $coordinates, common: true) {
       id
       coordinates {
@@ -13,6 +13,15 @@ export const SNP_QUERY = `
         pval_nominal
         slope
         pval_beta
+      }
+    }
+    gene(name_prefix: $gene_name_prefix, assembly: "grch38") {
+      name
+      id
+      coordinates {
+        chromosome
+        start
+        end
       }
     }
   }

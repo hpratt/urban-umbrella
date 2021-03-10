@@ -12,6 +12,9 @@ const COLUMNS: DataTableColumn<QTLDataTableRow>[] = [{
     header: "gene ID",
     value: row => row.gene_id
 }, {
+    header: "gene name",
+    value: row => row.name || ""
+}, {
     header: "tissue",
     value: row => row.tissue,
     render: row => row.tissue.replace(/_/g, " ")
@@ -30,7 +33,8 @@ const QTLDataTable: React.FC<QTLDataTableProps> = props => (
     <DataTable
         rows={props.data}
         columns={COLUMNS}
-        sortColumn={4}
+        sortColumn={5}
+        sortDescending
         itemsPerPage={8}
         searchable
     />
