@@ -5,8 +5,6 @@ export const LD_QUERY = gql`
 query SNP(
   $snpids: [String]!
   $rSquaredThreshold: Float!
-  $population: Population!
-  $subpopulation: SubPopulation
 ) {
   snpQuery(assembly: "hg38", snpids: $snpids) {
     id
@@ -14,19 +12,6 @@ query SNP(
       chromosome
       start
       end
-    }
-    linkageDisequilibrium(
-      population: $population
-      subpopulation: $subpopulation
-      rSquaredThreshold: $rSquaredThreshold
-    ) {
-      id
-      coordinates(assembly: "hg38") {
-        chromosome
-        start
-        end
-      }
-      rSquared
     }
   }
 }
@@ -48,6 +33,6 @@ export type LDQueryResponse = {
     snpQuery: {
         id: string;
         coordinates: GenomicRange;
-        linkageDisequilibrium: LDEntry[];
+        [key: string]: LDEntry[] | string | GenomicRange;
     }[];
 };

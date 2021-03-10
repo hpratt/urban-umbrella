@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Header } from 'semantic-ui-react';
-import { GenomeBrowser, GraphQLTrackSet, GraphQLTranscriptTrack, LDData, Link, LinkTrack, ManhattanTrack, WrappedFullBigWig, WrappedLDTrack, WrappedRulerTrack, WrappedSquishTranscriptTrack, WrappedTrack } from 'umms-gb';
+import { GenomeBrowser, GraphQLLDTrack, GraphQLTrackSet, GraphQLTranscriptTrack, Link, LinkTrack, ManhattanTrack, WrappedFullBigWig, WrappedLDTrack, WrappedRulerTrack, WrappedSquishTranscriptTrack, WrappedTrack } from 'umms-gb';
 import { FileDataLoader, BigWigReader } from "bigwig-reader";
 
 import { GenomicRange, QTLDataTableRow } from '../types';
 import { ApolloClient, InMemoryCache, useQuery } from '@apollo/client';
-import { LDEntry, LDQueryResponse, LD_QUERY } from './queries';
+import { LDQueryResponse, LD_QUERY } from './queries';
 import { associateBy, groupBy } from 'queryz';
 import { ManhattanSNP, SummaryStatisticSNP } from 'umms-gb/dist/components/tracks/manhattan/types';
 
@@ -25,6 +25,14 @@ function link(row: QTLDataTableRow): Link {
         score: -Math.log10(row.pval_beta)
     };
 }
+
+const POPULATIONS = [
+    { population: "EUROPEAN", subpopulation: "IBERIAN" },
+    { population: "EUROPEAN", subpopulation: "BRITISH" },
+    { population: "EUROPEAN", subpopulation: "FINNISH" },
+    { population: "EUROPEAN", subpopulation: "TOSCANI" },
+    { population: "EUROPEAN", subpopulation: "UTAH_RESIDENT_NW_EUROPEAN" }
+];
 
 const QTLBrowserView: React.FC<QTLBrowserViewProps> = props => {
 
@@ -58,12 +66,6 @@ const QTLBrowserView: React.FC<QTLBrowserViewProps> = props => {
         },
         client
     });
-    const ldMap = useMemo<Map<string, LDEntry[]>>( () => associateBy(data?.snpQuery || [], x => x.id, x => x.linkageDisequilibrium), [ data ])
-    const snps = useMemo( () => inView.map( x => ({ id: x.rsId, domain: x.coordinates })), [ inView ]);
-    const snpData = useMemo<LDData>( () => ({
-        snps,
-        ld: ldMap.get(anchor) || []
-    }), [ snps, ldMap, anchor ]);
 
     const referenceTrack = useMemo( () => ({
         url: "gs://data.genomealmanac.org/public/ATAC.aggregated.bigWig",
@@ -116,19 +118,31 @@ const QTLBrowserView: React.FC<QTLBrowserViewProps> = props => {
                 onDomainChanged={x => { props.onDomainChanged && props.onDomainChanged({ start: x.start, end: x.end, chromosome: x.chromosome! }); }}
             >
                 <WrappedRulerTrack domain={props.domain} height={40} title="coordinates (hg38)" titleSize={9} width={1200} id="ruler" />
-                <WrappedLDTrack
-                    titleSize={9}
-                    trackMargin={12}
-                    height={100}
+                <GraphQLLDTrack
                     domain={props.domain}
                     width={1200}
-                    id="LD"
-                    title={`SNPs with Linkage Disequilibrium (${props.population})`}
-                    data={snpData}
+                    transform=""
+                    id="hg38_ldtrack"
+                    populations={POPULATIONS}
+                    assembly="hg38"
                     anchor={anchor}
-                    ldThreshold={0.1}
-                    onVariantClick={(snp: { id: string }) => setAnchor(snp.id)}
-                />
+                    endpoint="https://snps.staging.wenglab.org/graphql"
+                >
+                    { POPULATIONS.map( p => (
+                        <WrappedLDTrack
+                            titleSize={9}
+                            trackMargin={12}
+                            height={100}
+                            domain={props.domain}
+                            width={1200}
+                            id="LD"
+                            title={`SNPs with Linkage Disequilibrium (${p.subpopulation})`}                            
+                            anchor={anchor}
+                            ldThreshold={0.1}
+                            onVariantClick={(snp: { id: string }) => setAnchor(snp.id)}
+                        />
+                    ))}
+                </GraphQLLDTrack>
                 <WrappedTrack width={1200} height={150} id="" titleSize={12} title="Summary Statistics">
                     <ManhattanTrack
                         width={1200}
