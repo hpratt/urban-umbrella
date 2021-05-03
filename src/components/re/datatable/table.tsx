@@ -15,11 +15,12 @@ const COLUMNS = (tissues: string[]): DataTableColumn<RDHSRow>[] => [{
     header: "coordinates (hg38)",
     value: row => `${row.coordinates.chromosome}:${row.coordinates.start}-${row.coordinates.end}`
 }, ...tissues.map( (tissue: string): DataTableColumn<RDHSRow> => ({
-    header: (
+    header: tissue,
+    headerRender: () => (
         <Popup
             content={<span>{TISSUE_MAP.get(tissue.split(" ")[0])} {tissue.split(" ")[1]}<br />(click to sort)</span>}
             trigger={<span>{tissue}</span>}
-        />
+        /> as unknown as string
     ),
     value: row => {
         const values = (row.tissueZScores.get(tissue) || []).map(x => x === -10 ? -4 : x);
@@ -34,19 +35,21 @@ const COLUMNS = (tissues: string[]): DataTableColumn<RDHSRow>[] => [{
             </span>
         );
     }
-})).slice(0, 12)];
+}))];
 
 const RDHSDataTable: React.FC<RDHSDataTableProps> = props => { 
     const columns = COLUMNS([ ...(props.data[0]?.tissueZScores.keys() || []) ]);
     return (
         <>
-            <DataTable
-                rows={props.data}
-                columns={columns}
-                sortColumn={columns.length > 2 ? 2 : 1}
-                itemsPerPage={8}
-                searchable
-            />
+            <div style={{ overflowX: "scroll" }}>
+                <DataTable
+                    rows={props.data}
+                    columns={columns}
+                    sortColumn={columns.length > 2 ? 2 : 1}
+                    itemsPerPage={8}
+                    searchable
+                />
+            </div>
             <Message info>
                 <Grid>
                     <Grid.Column width={1}><Icon name="info circle" /></Grid.Column>
