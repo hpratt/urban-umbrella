@@ -4,7 +4,7 @@ import { WrappedBatchRegionOrSNPSearch } from 'genomic-file-upload';
 
 import { ClientContext } from '../../App';
 import { NamedRegion, RDHS, RDHSRow } from './types';
-import { RDHS_QUERY } from './queries';
+import { RDHS_QUERY, EMBRYONIC_RDHS_QUERY, RDHS_BIOSAMPLE_QUERY } from './queries';
 import { Navbar } from '../navbar';
 import { RDHSDataTable } from './datatable';
 import { Banner } from './banner';
@@ -19,6 +19,7 @@ import { SNPWithCoordinates } from '../qtl/types';
 import { matchGenomicRegion, matchIsGenomicCoordinate } from '../qtl/page';
 import { SearchModal } from './searchmodals';
 import { mean } from 'mathjs';
+import { associateBy } from 'queryz';
 
 function expand(c: GenomicRange, e: number): GenomicRange {
     return {
@@ -32,6 +33,36 @@ function gValue(entry: number[]) {
     const values = entry.map(x => x === -10 ? -4 : x);
     return values.length < 1 ? -10.0 : (values.length === 1 ? values[0] : mean(values));
 }
+
+type ENCODEResponse = {
+    data: {
+        rDHSQuery: {
+            coordinates: GenomicRange;
+            accession: string;
+            dnase: {
+                experiment: string;
+                score: number;
+            }[];
+            h3k27ac: {
+                experiment: string;
+                score: number;
+            }[];
+        }[];
+    };
+};
+
+type ENCODEBiosampleResponse = {
+    data: {
+        dnaseBiosamples: { biosamples: {
+            name: string;
+            experimentAccession: string;
+        }[] };
+        h3k27acBiosamples: { biosamples: {
+            name: string;
+            experimentAccession: string;
+        }[] };
+    };
+};
 
 const RDHSPage: React.FC = () => {
 
@@ -52,7 +83,8 @@ const RDHSPage: React.FC = () => {
                 Math.max(...[ ...searchRegions].map(x => gValue(r.tissueZScores.get(x + " NeuN+") || []))) > 1.64
         )
     ), [ searchRegions ]);
-    const filtered = useMemo( () => (rows || []).filter(filterByTissue), [ rows, filterByTissue ] );
+    const filtered = useMemo( () => (rows || []).filter(x => x.__type === "PEC").filter(filterByTissue), [ rows, filterByTissue ] );
+    const encode = useMemo( () => (rows || []).filter(x => x.__type === "ENCODE"), [ rows ]);
 
     const loadBatch = useCallback( async (values: (GenomicRange | string)[]): Promise<RDHSRow[]> => {
         let v = values.filter( x => (x as GenomicRange).chromosome === undefined );
@@ -82,6 +114,34 @@ const RDHSPage: React.FC = () => {
                 .filter( (xx: any) => xx.rSquared > (ldPreferences.using ? ldPreferences.rSquared : 1.1) )
                 .map( (xx: any) => xx.coordinates )
         ]);
+        const biosamples = await (await fetch("https://ga.staging.wenglab.org/graphql", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                query: RDHS_BIOSAMPLE_QUERY,
+                variables: { coordinates: [ ...coordinates, ...values.filter(x => (x as GenomicRange).chromosome !== undefined) ] }
+            })
+        })).json() as ENCODEBiosampleResponse;
+        console.log(biosamples.data);
+        const dBiosampleMap = associateBy(biosamples.data.dnaseBiosamples.biosamples, x => x.experimentAccession, x => x.name);
+        const hBiosampleMap = associateBy(biosamples.data.h3k27acBiosamples.biosamples, x => x.experimentAccession, x => x.name);
+        const encode_rDHSs = await (await fetch("https://ga.staging.wenglab.org/graphql", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                query: EMBRYONIC_RDHS_QUERY,
+                variables: { coordinates: [ ...coordinates, ...values.filter(x => (x as GenomicRange).chromosome !== undefined) ] }
+            })
+        })).json();
+        const de = (encode_rDHSs as ENCODEResponse).data.rDHSQuery.map(x => ({
+            accession: x.accession,
+            coordinates: x.coordinates,
+            tissueZScores: new Map<string, number[]>([
+                ...x.dnase.map(xx => [ `embryonic ${dBiosampleMap.get(xx.experiment)!.replace(/spinal_cord/g, "spinal cord").split("_")[0]} ${dBiosampleMap.get(xx.experiment)!.split("_")[dBiosampleMap.get(xx.experiment)!.split("_").length - 2]} days DNase`, [ xx.score ] ] as [string, number[]]),
+                ...x.h3k27ac.map(xx => [ `embryonic ${hBiosampleMap.get(xx.experiment)!.replace(/spinal_cord/g, "spinal cord").split("_")[0]} ${hBiosampleMap.get(xx.experiment)!.split("_")[hBiosampleMap.get(xx.experiment)!.split("_").length - 2]} days H3K27ac`, [ xx.score ] ] as [string, number[]])
+            ]),
+            __type: "ENCODE"
+        }));
         return fetch("https://psychscreen.api.wenglab.org/graphql", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
@@ -90,18 +150,20 @@ const RDHSPage: React.FC = () => {
                 variables: { coordinates: [ ...coordinates, ...values.filter(x => (x as GenomicRange).chromosome !== undefined) ] }
             })
         }).then(response => response.json()).then(
-            response => {
-                return response.data.rDHSQuery.map( (x: RDHS) => ({
+            response => [
+                ...de,
+                ...response.data.rDHSQuery.map( (x: RDHS) => ({
                     accession: x.accession,
                     coordinates: x.coordinates,
                     tissueZScores: tissueZScores(x.zScores),
-                    summaryZScores: summaryZScores(x.zScores)
-                }));
-            }
+                    summaryZScores: summaryZScores(x.zScores),
+                    __type: "PEC"
+                }))
+            ]
         );
     }, [ ldPreferences, regions ]);
 
-    const getSuggestions = useCallback(async (e: any, d: any): Promise<any[] | Record<string, any> | undefined> => {
+    const getSuggestions = useCallback(async (_: any, d: any): Promise<any[] | Record<string, any> | undefined> => {
         return fetch(client, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
@@ -151,7 +213,8 @@ const RDHSPage: React.FC = () => {
                     <>
                         <Menu secondary pointing>
                             <Menu.Item onClick={() => setPage(0)} active={page === 0}>Genome Browser View</Menu.Item>
-                            <Menu.Item onClick={() => setPage(1)} active={page === 1}>Table View</Menu.Item>
+                            <Menu.Item onClick={() => setPage(1)} active={page === 1}>Table View (Adult)</Menu.Item>
+                            <Menu.Item onClick={() => setPage(2)} active={page === 2}>Table View (Embryonic)</Menu.Item>
                         </Menu>
                         <Header as="h3">Found {rows.length} regulatory element{rows.length !== 1 ? "s" : ""} in the region(s) you searched:</Header>
                         { page === 0 ? (
@@ -175,6 +238,8 @@ const RDHSPage: React.FC = () => {
                                 ) : null}
                                 <RDHSDataTable data={filtered} />
                             </>
+                        ) : page === 2 ? (
+                            <RDHSDataTable data={encode} />
                         ) : null}
                     </>
                 )}

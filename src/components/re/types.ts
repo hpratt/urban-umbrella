@@ -1,5 +1,3 @@
-import { WrappedBatchedRegionOrSNPSearchProps } from "genomic-file-upload";
-import { UploadWithRegionOrSNPSearchBoxProps } from "genomic-file-upload/dist/components/upload/WithSearchBox";
 import { GenomicRange } from "genomic-file-upload/dist/utilities/types";
 
 export type ZScore = {
@@ -18,6 +16,7 @@ export type RDHSRow = {
     coordinates: GenomicRange;
     tissueZScores: Map<string, number[]>;
     summaryZScores: Map<string, number[]>;
+    __type: string;
 };
 
 export type NamedRegion = {
