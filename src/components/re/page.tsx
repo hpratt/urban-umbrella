@@ -88,7 +88,7 @@ const RDHSPage: React.FC = () => {
 
     const loadBatch = useCallback( async (values: (GenomicRange | string)[]): Promise<RDHSRow[]> => {
         let v = values.filter( x => (x as GenomicRange).chromosome === undefined );
-        if (typeof v[0] !== "string") v = [ ...(v[0] as unknown as Set<string>) ];
+        if (v[0] !== undefined && typeof v[0] !== "string") v = [ ...(v[0] as unknown as Set<string>) ];
         const s = typeof v[0] === "string" ? v : [];
         const snps = await fetch("https://snps.staging.wenglab.org/graphql", {
             method: "POST",
