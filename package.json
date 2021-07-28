@@ -1,6 +1,6 @@
 {
   "name": "urban-umbrella",
-  "version": "0.6.2",
+  "version": "0.7.1",
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.0.2",
@@ -32,7 +32,7 @@
     "ts-bedkit": "^0.1.0",
     "ts-ztable": "^0.2.1",
     "typescript": "^3.7.3",
-    "umms-gb": "^3.0.4"
+    "umms-gb": "^3.0.6"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -54,5 +54,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "resolutions": {
+    "browserslist": "4.6.2",
+    "caniuse-lite": "1.0.30000974"
   }
 }

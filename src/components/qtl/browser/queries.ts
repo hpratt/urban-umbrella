@@ -4,7 +4,6 @@ import { GenomicRange } from "../types";
 export const LD_QUERY = gql`
 query SNP(
   $snpids: [String]!
-  $rSquaredThreshold: Float!
 ) {
   snpQuery(assembly: "hg38", snpids: $snpids) {
     id

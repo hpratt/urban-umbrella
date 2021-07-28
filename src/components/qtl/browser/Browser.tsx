@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Header } from 'semantic-ui-react';
+import { Button, Header, Modal } from 'semantic-ui-react';
 import { GenomeBrowser, GraphQLLDTrack, GraphQLTrackSet, GraphQLTranscriptTrack, Link, LinkTrack, ManhattanTrack, WrappedFullBigWig, WrappedLDTrack, WrappedRulerTrack, WrappedSquishTranscriptTrack, WrappedTrack } from 'umms-gb';
 import { FileDataLoader, BigWigReader } from "bigwig-reader";
 
@@ -8,6 +8,7 @@ import { ApolloClient, InMemoryCache, useQuery } from '@apollo/client';
 import { LDQueryResponse, LD_QUERY } from './queries';
 import { associateBy, groupBy } from 'queryz';
 import { ManhattanSNP, SummaryStatisticSNP } from 'umms-gb/dist/components/tracks/manhattan/types';
+import SNPDetails from '../../snp/Page';
 
 export type QTLBrowserViewProps = {
     domain: GenomicRange;
@@ -42,6 +43,7 @@ const QTLBrowserView: React.FC<QTLBrowserViewProps> = props => {
     const [ anchor, setAnchor ] = useState("");
     const client = useMemo( () => new ApolloClient({ uri: "https://ga.staging.wenglab.org/graphql", cache: new InMemoryCache() }), []);
     const ref = useRef<SVGSVGElement>(null);
+    const [ modal, setModal ] = useState(false);
 
     useEffect( () => {
         bigBed?.readBigBedData(props.domain.chromosome, props.domain.start, props.domain.chromosome, props.domain.end).then(
@@ -104,18 +106,37 @@ const QTLBrowserView: React.FC<QTLBrowserViewProps> = props => {
         </div>
     ), [ snpGroupedQTLs ]);
 
+    const zoomOut = useCallback( (factor: number) => {
+        const width = (props.domain.end - props.domain.start) * factor;
+        const m = (props.domain.end + props.domain.start) / 2;
+        props.onDomainChanged && props.onDomainChanged({
+            ...props.domain,
+            start: Math.floor(m - width / 2),
+            end: Math.ceil(m + width / 2)
+        });
+    }, [ props.domain ]);
+
     return (
         <>
+            <Modal open={modal} style={{ width: "90%" }}>
+                <Modal.Header>Details for {anchor}</Modal.Header>
+                <Modal.Content>
+                    <SNPDetails snp={anchor} nonav />
+                </Modal.Content>
+                <Modal.Actions><Button onClick={() => setModal(false)}>Close</Button></Modal.Actions>
+            </Modal>
             <Button primary onClick={() => fileInput && fileInput.current && fileInput.current.click()}>
                 Upload Summary Statistics
             </Button>
             <input type="file" name="file" hidden ref={fileInput} onChange={onFileChange} multiple />
+            <Button onClick={ () => zoomOut(3) }>Zoom Out 3x</Button>
+            <Button onClick={ () => zoomOut(0.3) }>Zoom In 3x</Button>
             <GenomeBrowser
                 svgRef={ref}
                 innerWidth={1200}
                 width="95%"
                 domain={props.domain}
-                onDomainChanged={x => { props.onDomainChanged && props.onDomainChanged({ start: x.start, end: x.end, chromosome: x.chromosome! }); }}
+                onDomainChanged={x => { props.onDomainChanged && props.onDomainChanged({ start: x.start, end: x.end, chromosome: props.domain.chromosome }); }}
             >
                 <WrappedRulerTrack domain={props.domain} height={40} title="coordinates (hg38)" titleSize={9} width={1200} id="ruler" />
                 <GraphQLLDTrack
@@ -139,7 +160,7 @@ const QTLBrowserView: React.FC<QTLBrowserViewProps> = props => {
                             title={`SNPs with Linkage Disequilibrium (${p.subpopulation})`}                            
                             anchor={anchor}
                             ldThreshold={0.1}
-                            onVariantClick={(snp: { id: string }) => setAnchor(snp.id)}
+                            onVariantClick={(snp: { id: string }) => { setAnchor(snp.id); setModal(true); }}
                         />
                     ))}
                 </GraphQLLDTrack>
@@ -152,6 +173,7 @@ const QTLBrowserView: React.FC<QTLBrowserViewProps> = props => {
                         svgRef={ref}
                         tooltipContent={Tooltip}
                         data={inView}
+                        onSNPClick={() => setModal(true)}
                     />
                 </WrappedTrack>
                 <GraphQLTranscriptTrack endpoint="https://ga.staging.wenglab.org/graphql" assembly="GRCh38" id="tx" domain={props.domain} transform="">

@@ -36,11 +36,44 @@ export function matchGenomicRegion(region: string): RegExpMatchArray | null {
     return /(?<chromosome>[A-Za-z0-9_]+)[:\t ](?<start>[0-9]+)[-\t ](?<end>[0-9]+)/g.exec(region.replace(/,/g, ''));
 }
 
+const PSC_REGIONS = [
+    { chromosome: "chr19", start: 47703205, end: 49703205 },
+    { chromosome: "chr2", start: 110175424, end: 112175424 },
+    { chromosome: "chr4", start: 9715315, end: 11715315 },
+    { chromosome: "chr11", start: 110709215, end: 112709215 },
+    { chromosome: "chr4", start: 101657480, end: 103657480 },
+    { chromosome: "chr19", start: 45702450, end: 47702450 },
+    { chromosome: "chr16", start: 2723109, end: 4723109 },
+    { chromosome: "chr3", start: 154089424, end: 156089424 },
+    { chromosome: "chr13", start: 39220445, end: 41220445 },
+    { chromosome: "chr10", start: 131544853, end: 133544853 },
+    { chromosome: "chr21", start: 38094818, end: 40094818 },
+    { chromosome: "chr16", start: 67908687, end: 69908687 },
+    { chromosome: "chr6", start: 136913152, end: 138913152 },
+    { chromosome: "chr21", start: 41434957, end: 43434957 },
+    { chromosome: "chr15", start: 78975159, end: 80975159 },
+    { chromosome: "chr3", start: 48684099, end: 50684099 },
+    { chromosome: "chr17", start: 48208404, end: 50208404 },
+    { chromosome: "chr2", start: 202747335, end: 204747335 },
+    { chromosome: "chr22", start: 23914162, end: 25914162 },
+    { chromosome: "chr3", start: 70473942, end: 72473942 },
+    { chromosome: "chr6", start: 89320722, end: 91320722 },
+    { chromosome: "chr3", start: 70104739, end: 72104739 },
+    { chromosome: "chr18", start: 68876452, end: 70876452 },
+    { chromosome: "chr11", start: 63340263, end: 65340263 },
+    { chromosome: "chr1", start: 1595307, end: 3595307 },
+    { chromosome: "chr16", start: 10075826, end: 12075826 },
+    { chromosome: "chr10", start: 5066476, end: 7066476 },
+    { chromosome: "chr4", start: 121578590, end: 123578590 },
+    { chromosome: "chr12", start: 110446804, end: 112446804 },
+];
+
 const QTLPage: React.FC = () => {
 
     const client = "https://ga.staging.wenglab.org/graphql"; // useContext(ClientContext);
     const [ rows, setRows ] = useState<QTLDataTableRow[] | null>(null);
     const [ page, setPage ] = useState(0);
+    const [ domain, setDomain ] = useState(PSC_REGIONS[3]);
 
     const loadBatch = useCallback( async (value: (GenomicRange | any)[]): Promise<QTLDataTableRow[]> => {
         const coordinates = value.filter(x => (x as GenomicRange).chromosome !== undefined);
@@ -110,6 +143,7 @@ const QTLPage: React.FC = () => {
             }
         )
     }, [ client ]);
+    console.log(domain);
 
     return (
         <>
@@ -140,11 +174,12 @@ const QTLPage: React.FC = () => {
                     </>
                 ) : (
                     <Browser
-                        // domain={{ chromosome: "chr10", start: 6006376, end: 6726377 }}
-                        // domain={{ chromosome: "chr4", start: 102606371, end: 102666372 }}
-                        // domain={{ chromosome: "chr16", start: 11012144, end: 11132145 }}
-                        // domain={{ chromosome: "chr3", start: 49605050, end: 49725051 }}
-                        domain={{ chromosome: "chr21", start: 39004818, end: 39134818 }}
+                        domain={domain}
+                        onDomainChanged={setDomain}
+                        // domain={{ chromosome: "chr4", start: 101606371, end: 103666372 }}
+                        // domain={{ chromosome: "chr16", start: 10512144, end: 11632145 }}
+                        // domain={{ chromosome: "chr3", start: 47605050, end: 51725051 }}
+                        // domain={{ chromosome: "chr21", start: 36894818, end: 39444818 }}
                         population="EUROPEAN"
                         rSquaredThreshold={0.1}
                         qtls={rows}
