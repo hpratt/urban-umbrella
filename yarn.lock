@@ -5177,10 +5177,10 @@ functional-red-black-tree@^1.0.1:
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
 
-genomic-file-upload@^0.8.0:
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/genomic-file-upload/-/genomic-file-upload-0.8.0.tgz#27c6bb9f1187f26ddc757809cc8e64d466ff9a11"
-  integrity sha512-oyK1M01h236HBpzTt7eJAeBrzvvB4VjcCJ/7GU9+6uNzu2aVk7p0oPRJSqCe9WYNPxaA+y5AvubRUDkiD6n80g==
+genomic-file-upload@^0.8.1:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/genomic-file-upload/-/genomic-file-upload-0.8.1.tgz#a0c9f7c6d75706c38b6f2ea1629515e0002f0477"
+  integrity sha512-igqkSU10IUhCqflbVugirIK0uOA3UUPyuSLeuhexACe1C+9q/RevwjL1t6EpFWFANn1maGXg5K1P0Gj2WVq0Wg==
   dependencies:
     pako "^1.0.11"
 

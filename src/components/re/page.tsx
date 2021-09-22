@@ -80,6 +80,7 @@ const RDHSPage: React.FC = () => {
         rSquared: 0.7,
         population: "EUROPEAN"
     });
+    console.log(regions);
 
     const filterByTissue = useCallback( (r: RDHSRow): boolean => (
         searchRegions === null || searchRegions.size === 0 ? true : (
@@ -94,7 +95,7 @@ const RDHSPage: React.FC = () => {
         let v = values.filter( x => (x as GenomicRange).chromosome === undefined );
         if (v[0] !== undefined && typeof v[0] !== "string") v = [ ...(v[0] as unknown as Set<string>) ];
         const s = typeof v[0] === "string" ? v : [];
-        const snps = await fetch("https://snps.staging.wenglab.org/graphql", {
+        const snps = await fetch("https://ga.staging.wenglab.org/graphql", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -107,11 +108,12 @@ const RDHSPage: React.FC = () => {
             })
         });
         const j = await snps.json();
-        setRegions([
+        const r = [
             ...regions,
             ...values.filter(x => (x as GenomicRange).chromosome !== undefined).map(x => ({ region: x as GenomicRange, name: "" })),
             ...j.data.snpQuery.map((x: any) => ({ region: expand(x.coordinates, 100000), name: x.id }))
-        ]);
+        ];
+        if (r.length > 0) setRegions(r);
         const coordinates = j.data.snpQuery.flatMap( (x: any) => [
             x.coordinates,
             ...x.linkageDisequilibrium
@@ -246,6 +248,7 @@ const RDHSPage: React.FC = () => {
                         onError={error => { setRows([]); console.log(error); }}
                         example={Example({ onLDPreferencesChanged: setLDPreferences, ldPreferences })}
                         getSuggestions={getSuggestions}
+                        batchSize={75}
                     />
                 ) : searchRegions === null ? (
                     <SearchModal
