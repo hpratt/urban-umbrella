@@ -21,6 +21,10 @@ import { SearchModal } from './searchmodals';
 import { mean } from 'mathjs';
 import { associateBy } from 'queryz';
 
+const names = [
+    "DFC HSB240", "DFC HSB100", "DFC HSB102", "CBC HSB240", "CBC HSB100", "CBC HSB102"
+];
+
 function expand(c: GenomicRange, e: number): GenomicRange {
     return {
         chromosome: c.chromosome,
@@ -122,7 +126,6 @@ const RDHSPage: React.FC = () => {
                 variables: { coordinates: [ ...coordinates, ...values.filter(x => (x as GenomicRange).chromosome !== undefined) ] }
             })
         })).json() as ENCODEBiosampleResponse;
-        console.log(biosamples.data);
         const dBiosampleMap = associateBy(biosamples.data.dnaseBiosamples.biosamples, x => x.experimentAccession, x => x.name);
         const hBiosampleMap = associateBy(biosamples.data.h3k27acBiosamples.biosamples, x => x.experimentAccession, x => x.name);
         const encode_rDHSs = await (await fetch("https://ga.staging.wenglab.org/graphql", {
@@ -133,12 +136,52 @@ const RDHSPage: React.FC = () => {
                 variables: { coordinates: [ ...coordinates, ...values.filter(x => (x as GenomicRange).chromosome !== undefined) ] }
             })
         })).json();
+        const urls = [
+            "PEC_ASD_Yale-UCSF_DFC_Epigenomics_H3K27ac_HiSeq2000_HSB240_PEC_ASD_Yale-UCSF_DFC_Epigenomics_Input_HiSeq2000_HSB100_psychencode_pooled_ta_ctl.fc.signal.bigWig.zscore.txt.bigBed",
+            "PEC_ASD_Yale-UCSF_DFC_Epigenomics_H3K27ac_HiSeq2000_HSB100_PEC_ASD_Yale-UCSF_DFC_Epigenomics_Input_HiSeq2000_HSB100_psychencode_pooled_ta_ctl.fc.signal.bigWig.zscore.txt.bigBed",
+            "PEC_ASD_Yale-UCSF_DFC_Epigenomics_H3K27ac_HiSeq2000_HSB102_PEC_ASD_Yale-UCSF_DFC_Epigenomics_Input_HiSeq2000_HSB100_psychencode_pooled_ta_ctl.fc.signal.bigWig.zscore.txt.bigBed",
+            "PEC_ASD_Yale-UCSF_CBC_Epigenomics_H3K27ac_HiSeq2000_HSB240_PEC_ASD_Yale-UCSF_CBC_Epigenomics_Input_HiSeq2000_HSB100_psychencode_pooled_ta_ctl.fc.signal.bigWig.zscore.txt.bigBed",
+            "PEC_ASD_Yale-UCSF_CBC_Epigenomics_H3K27ac_HiSeq2000_HSB100_PEC_ASD_Yale-UCSF_CBC_Epigenomics_Input_HiSeq2000_HSB100_psychencode_pooled_ta_ctl.fc.signal.bigWig.zscore.txt.bigBed",
+            "PEC_ASD_Yale-UCSF_CBC_Epigenomics_H3K27ac_HiSeq2000_HSB102_PEC_ASD_Yale-UCSF_CBC_Epigenomics_Input_HiSeq2000_HSB100_psychencode_pooled_ta_ctl.fc.signal.bigWig.zscore.txt.bigBed"
+        ];
+        const vv: { [key: string]: number } = {}; urls.forEach((x, i) => vv[`gs://gcp.wenglab.org/${x}`] = i);
+        const requests = urls.flatMap( x => [ ...coordinates, ...values.filter(x => (x as GenomicRange).chromosome !== undefined) ].map(c => ({
+            url: `gs://gcp.wenglab.org/${x}`,
+            chr1: c.chromosome,
+            start: c.start,
+            chr2: c.chromosome,
+            end: c.end
+        })));
+        const bigResponses = await (await fetch("https://ga.staging.wenglab.org/graphql", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                query: `query q($requests: [BigRequest!]!) {
+                    bigRequests(requests: $requests) {
+                    data
+                  }
+                }`,
+                variables: {
+                    requests
+                }
+            })
+        })).json();
+        const zscores: { [key: string]: { [key: string ]: number } } = {};
+        try {
+            bigResponses.data.bigRequests.forEach((x: any, i: number) => {
+                if (!zscores[names[vv[requests[i].url]]]) zscores[names[vv[requests[i].url]]] = {};
+                x.data.forEach((xx: any) => {
+                    zscores[names[vv[requests[i].url]]][xx.name.split("_")[0]] = +xx.name.split("_")[1];
+                });
+            });
+        } catch (e) {}
         const de = (encode_rDHSs as ENCODEResponse).data.rDHSQuery.map(x => ({
             accession: x.accession,
             coordinates: x.coordinates,
             tissueZScores: new Map<string, number[]>([
                 ...x.dnase.map(xx => [ `embryonic ${dBiosampleMap.get(xx.experiment)!.replace(/spinal_cord/g, "spinal cord").split("_")[0]} ${dBiosampleMap.get(xx.experiment)!.split("_")[dBiosampleMap.get(xx.experiment)!.split("_").length - 2]} days DNase`, [ xx.score ] ] as [string, number[]]),
-                ...x.h3k27ac.map(xx => [ `embryonic ${hBiosampleMap.get(xx.experiment)!.replace(/spinal_cord/g, "spinal cord").split("_")[0]} ${hBiosampleMap.get(xx.experiment)!.split("_")[hBiosampleMap.get(xx.experiment)!.split("_").length - 2]} days H3K27ac`, [ xx.score ] ] as [string, number[]])
+                ...x.h3k27ac.map(xx => [ `embryonic ${hBiosampleMap.get(xx.experiment)!.replace(/spinal_cord/g, "spinal cord").split("_")[0]} ${hBiosampleMap.get(xx.experiment)!.split("_")[hBiosampleMap.get(xx.experiment)!.split("_").length - 2]} days H3K27ac`, [ xx.score ] ] as [string, number[]]),
+                ...Object.keys(zscores).map(xx => [ `${xx} H3K27ac`, [ (zscores[xx] && zscores[xx][x.accession]) || -10 ] ] as [string, number[]] )
             ]),
             __type: "ENCODE"
         }));
@@ -216,7 +259,7 @@ const RDHSPage: React.FC = () => {
                             <Menu.Item onClick={() => setPage(1)} active={page === 1}>Table View (Adult)</Menu.Item>
                             <Menu.Item onClick={() => setPage(2)} active={page === 2}>Table View (Embryonic)</Menu.Item>
                         </Menu>
-                        <Header as="h3">Found {rows.length} regulatory element{rows.length !== 1 ? "s" : ""} in the region(s) you searched:</Header>
+                        <Header as="h3">Found {(page === 2 ? encode : filtered).length} regulatory element{rows.length !== 1 ? "s" : ""} in the region(s) you searched:</Header>
                         { page === 0 ? (
                             <RDHSBrowserPage data={rows} ranges={regions} ldPreferences={ldPreferences} />
                         ) : page === 1 ? (

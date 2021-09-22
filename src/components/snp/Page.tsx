@@ -24,12 +24,19 @@ const SNP_COORDINATE_QUERY = `
     }
 `;
 
-const COORDINATE = /(chr[0-9XYM]+)[:]([0-9,]+)[-]([0-9,]+)/g;
+const COORDINATE = /(chr[0-9XYM]+)[:\s]([0-9,]+)[-\s]([0-9,]+)/g;
 
-const Page: React.FC = () => {
+export type PageProps = {
+    nonav?: boolean;
+    snp?: string;
+};
+
+const Page: React.FC<PageProps> = props => {
     
     const [ page, setPage ] = useState(-1);
-    const { snp } = useParams<{ snp: string }>();
+    let { snp } = useParams<{ snp: string }>();
+    const rsnp = useMemo( () => props.snp || snp, [ props.snp, snp ]);
+    snp = rsnp;
     const [ sID, setSID ] = useState(snp);
     const r = useMemo( () => [ ...snp.matchAll(COORDINATE) ], [ snp ]);
     const coordinates = useMemo( () => {
@@ -60,8 +67,12 @@ const Page: React.FC = () => {
     
     return coordinates && sID.match(COORDINATE) ? <Loader active>Loading...</Loader> : (
         <>
-            <Navbar />
-            <Banner snp={sID} />
+            { !props.nonav && (
+                <>
+                    <Navbar />
+                    <Banner snp={sID} />
+                </>
+            )}
             <Container style={{ width: "80%", marginTop: "3em" }}>
                 { page === -1 && <>Select an annotation category:<br /></> }
                 <Menu>
